@@ -15,9 +15,9 @@ fi
 mkdir -p stl_export
 
 parts=(
-    hull_stage5_bow hull_stage5_mid hull_stage5_stern
+    hull_bow hull_mid hull_stern
     cockpit_floor_fixed floor_battery_lid floor_aft_lid
-    console_stage1 console_oled_retainer windshield_frame
+    console console_oled_retainer windshield_frame
     helm_bench_cushion helm_bench_frame_port helm_bench_frame_starboard
     helm_bench_cross_braces helm_bench_side_rails
     aft_bench_servo_cover aft_bench_cushion aft_bench_backrest aft_bench_seat_support

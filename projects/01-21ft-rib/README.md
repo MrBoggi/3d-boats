@@ -58,17 +58,13 @@ The vendor lower unit is too short for the scaled XL transom. The separate print
 - Propulsion: XL leg adapter. The vendor outboard remains an external dependency.
 - Accessory: removable ladder.
 
-The old internal motor, shaft support, and fixed-shaft drivetrain files remain as historical design references in `src/`, but are not imported by the production assembly or exported by `build.sh`.
-
-## Source and previews
+## Source layout
 
 - `src/assembly.scad`: production assembly and export selector.
 - `src/assembly_with_motor.scad`: complete visual assembly including vendor outboard.
 - `src/config.scad`: dimensions, component envelopes, tolerances, and locked datums.
-- `src/hull_stage5_joints_preview.scad`: hull split/joint review.
-- `src/floor_hull_integration_preview.scad`: floor and hull integration.
-- `src/outboard_xl_extension_preview.scad`: motor/adapter interface review.
-- Files ending in `_preview.scad`, `_structure_preview.scad`, `_check.scad`, or `_audit_preview.scad` are diagnostic views and are not production exports.
+- `src/hull.scad` and `src/hull_geometry.scad`: final hull and printable joints.
+- Remaining part files correspond directly to current production assemblies.
 
 Generated PNG previews stay in `preview/` and generated meshes in `stl_export/`; both are ignored by Git.
 

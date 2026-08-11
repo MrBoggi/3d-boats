@@ -1,5 +1,5 @@
 include <config.scad>
-use <stern_stage3.scad>
+use <stern.scad>
 
 // Bow-to-stern coordinate stations. The pontoon stations are calibrated from
 // normalized plan-view widths in the supplied Zodiac reference. the first station sits 20 mm aft of X=0,

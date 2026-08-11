@@ -1,8 +1,8 @@
 // Presentation-only complete assembly. The included assembly renders the
 // approved boat; the vendor outboard is added with the locked Stage 3 datums.
 include <assembly.scad>
-use <stern_stage3.scad>
-use <outboard_xl_extension.scad>
+use <stern.scad>
+use <outboard_xl_adapter.scad>
 
 show_mount0 = true;
 show_outboard = true;

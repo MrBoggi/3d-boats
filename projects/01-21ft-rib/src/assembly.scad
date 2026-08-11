@@ -1,13 +1,13 @@
 include <config.scad>
-include <hull_stage5_joints.scad>
+include <hull.scad>
 use <hardware.scad>
 use <ladder.scad>
-use <console_stage1.scad>
-use <helm_bench_stage1.scad>
-use <aft_bench_stage1.scad>
-use <bow_bench_stage1.scad>
-use <floor_stage1.scad>
-use <outboard_xl_extension.scad>
+use <console.scad>
+use <helm_bench.scad>
+use <aft_bench.scad>
+use <bow_bench.scad>
+use <floor.scad>
+use <outboard_xl_adapter.scad>
 
 module assembled_rib() {
     color([0.12, 0.14, 0.17]) {
@@ -41,11 +41,11 @@ module assembled_rib() {
 
 if (selected_part == "assembly")
     assembled_rib();
-else if (selected_part == "hull_stage5_bow")
+else if (selected_part == "hull_bow")
     stage5_bow_section();
-else if (selected_part == "hull_stage5_mid")
+else if (selected_part == "hull_mid")
     stage5_mid_section();
-else if (selected_part == "hull_stage5_stern")
+else if (selected_part == "hull_stern")
     stage5_stern_section();
 else if (selected_part == "console_helm")
     console_shell_stage1();
@@ -93,7 +93,7 @@ else if (selected_part == "ladder")
     ladder();
 else if (selected_part == "hardware_debug")
     hardware_envelopes();
-else if (selected_part == "console_stage1")
+else if (selected_part == "console")
     console_shell_stage1();
 else if (selected_part == "console_oled_retainer")
     rotate([0, 90, 0])

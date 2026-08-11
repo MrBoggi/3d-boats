@@ -1,5 +1,5 @@
 include <config.scad>
-use <outboard_adapter.scad>
+use <outboard_mount.scad>
 use <../../../shared/components/servos/savox_sw0250mg.scad>
 
 stern_station_x = [430, 540, 585, 592, 625, 645, 660];
