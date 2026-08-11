@@ -2,6 +2,8 @@
 
 Parametric 660 × 252 mm RIB for a Bambu Lab A1. The approved design uses a three-section V-hull, integrated pontoons, a flat removable cockpit floor, removable interior modules, and a steerable 1:10 outboard.
 
+![Complete 21 ft RIB assembly](png/assembly_with_motor.png)
+
 ## Status
 
 The hull form, floor, helm console, helm bench, aft bench, bow seat and rails, transom interface, and XL outboard adapter are visually approved and design-locked. OpenSCAD compilation is checked before release. Production STL export, slicer review, physical fit, flotation, sealing, and water testing remain required.
@@ -60,20 +62,27 @@ The vendor lower unit is too short for the scaled XL transom. The separate print
 
 ## Source layout
 
-- `src/assembly.scad`: production assembly and export selector.
-- `src/assembly_with_motor.scad`: complete visual assembly including vendor outboard.
-- `src/config.scad`: dimensions, component envelopes, tolerances, and locked datums.
-- `src/hull.scad` and `src/hull_geometry.scad`: final hull and printable joints.
+```text
+01-21ft-rib/
+├── scad/   # Parametric OpenSCAD source
+├── stl/    # 25 ready-to-share printable parts
+└── png/    # Rendered assembly views
+```
+
+- `scad/assembly.scad`: production assembly and export selector.
+- `scad/assembly_with_motor.scad`: complete visual assembly including vendor outboard.
+- `scad/config.scad`: dimensions, component envelopes, tolerances, and locked datums.
+- `scad/hull.scad` and `scad/hull_geometry.scad`: final hull and printable joints.
 - Remaining part files correspond directly to current production assemblies.
 
-Generated PNG previews stay in `preview/` and generated meshes in `stl_export/`; both are ignored by Git.
+Approved distribution files are committed in `stl/` and `png/`. Temporary development previews stay in ignored `preview/` folders.
 
 ## Build
 
 Open and inspect the complete model first:
 
 ```sh
-openscad src/assembly_with_motor.scad
+openscad scad/assembly_with_motor.scad
 ```
 
 Export all approved project-owned parts:
@@ -82,13 +91,24 @@ Export all approved project-owned parts:
 ./build.sh --approved
 ```
 
-Individual parts can be exported through `src/assembly.scad`, for example:
+Individual parts can be exported through `scad/assembly.scad`, for example:
 
 ```sh
 openscad -o outboard_xl_adapter.stl \
   -D "selected_part=\"outboard_xl_adapter\"" \
-  src/assembly.scad
+  scad/assembly.scad
 ```
+
+## Print orientation
+
+| Part group | Recommended orientation |
+|---|---|
+| Hull bow, mid, stern | Keel down; verify the 252 mm beam and plate margins |
+| Fixed floor and hatch lids | Flat underside on the build plate |
+| Console and bow locker base | Mounting base down |
+| Seat cushions and backrests | Largest flat rear or underside face down |
+| Bench frames, rails, windshield hoop, ladder | Largest flat side in the build plane; add local supports only where needed |
+| XL outboard adapter | One machined mating flange down; verify bolt passages after slicing |
 
 ## Recommended print and assembly sequence
 
@@ -107,7 +127,7 @@ openscad -o outboard_xl_adapter.stl \
 - [x] Hull split fits the nominal Bambu Lab A1 build volume.
 - [x] Production export list excludes the abandoned internal drivetrain.
 - [x] XL adapter has passed isolated CGAL manifold rendering (`Simple: yes`).
-- [ ] Full STL batch exported after this cleanup.
+- [x] Full STL batch exported after the source-layout cleanup.
 - [ ] Every STL sliced and checked in Bambu Studio.
 - [ ] Purchased components measured and physically test-fitted.
 - [ ] Hull sealed and leak-tested.

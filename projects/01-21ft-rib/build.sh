@@ -2,17 +2,22 @@
 set -euo pipefail
 
 if [[ "${1:-}" != "--approved" ]]; then
-    echo "Refusing STL export: review src/assembly.scad first." >&2
+    echo "Refusing export: review scad/assembly.scad first." >&2
     echo "After visual approval, run: ./build.sh --approved" >&2
     exit 2
 fi
 
-if ! command -v openscad >/dev/null 2>&1; then
-    echo "Error: openscad was not found in PATH." >&2
+if command -v openscad >/dev/null 2>&1; then
+    openscad_cmd=(openscad)
+elif command -v flatpak-spawn >/dev/null 2>&1 \
+        && flatpak-spawn --host sh -lc "command -v openscad" >/dev/null 2>&1; then
+    openscad_cmd=(flatpak-spawn --host openscad)
+else
+    echo "Error: openscad was not found locally or on the Flatpak host." >&2
     exit 1
 fi
 
-mkdir -p stl_export
+mkdir -p stl png
 
 parts=(
     hull_bow hull_mid hull_stern
@@ -28,10 +33,28 @@ parts=(
 
 for part in "${parts[@]}"; do
     echo "Exporting ${part}.stl"
-    openscad \
-        -o "stl_export/${part}.stl" \
+    "${openscad_cmd[@]}" \
+        -o "stl/${part}.stl" \
         -D "selected_part=\"${part}\"" \
-        src/assembly.scad
+        scad/assembly.scad
 done
 
-echo "Done. STL files are in stl_export/."
+echo "Rendering assembly PNG files"
+"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+    --projection=p --imgsize=1600,1000 \
+    --camera=330,0,45,65,0,25,900 \
+    -o png/assembly_isometric.png scad/assembly.scad
+"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+    --projection=p --imgsize=1600,1000 \
+    --camera=330,0,45,0,0,0,900 \
+    -o png/assembly_top.png scad/assembly.scad
+"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+    --projection=p --imgsize=1600,1000 \
+    --camera=330,0,45,90,0,0,900 \
+    -o png/assembly_side.png scad/assembly.scad
+"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+    --projection=p --imgsize=1600,1000 \
+    --camera=330,0,45,65,0,25,900 \
+    -o png/assembly_with_motor.png scad/assembly_with_motor.scad
+
+echo "Done. STL files are in stl/ and PNG files are in png/."

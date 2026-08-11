@@ -1,5 +1,3 @@
-stl_export/
-*.stl
 *.3mf
 /console_layout_check.png
 /projects/*/preview/
