@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenSCAD Modeling"
+  short_description: "Build printable parametric OpenSCAD projects"
+  default_prompt: "Use $openscad-modeling to create and verify a printable parametric OpenSCAD project."

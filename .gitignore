@@ -1,0 +1,8 @@
+stl_export/
+*.stl
+*.3mf
+/console_layout_check.png
+/projects/*/preview/
+
+# Unmodified third-party downloads; see shared component documentation.
+/vendor/
