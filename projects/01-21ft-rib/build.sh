@@ -40,19 +40,19 @@ for part in "${parts[@]}"; do
 done
 
 echo "Rendering assembly PNG files"
-"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+"${openscad_cmd[@]}" --preview --autocenter --viewall \
     --projection=p --imgsize=1600,1000 \
     --camera=330,0,45,65,0,25,900 \
     -o png/assembly_isometric.png scad/assembly.scad
-"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+"${openscad_cmd[@]}" --preview --autocenter --viewall \
     --projection=p --imgsize=1600,1000 \
     --camera=330,0,45,0,0,0,900 \
     -o png/assembly_top.png scad/assembly.scad
-"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+"${openscad_cmd[@]}" --preview --autocenter --viewall \
     --projection=p --imgsize=1600,1000 \
     --camera=330,0,45,90,0,0,900 \
     -o png/assembly_side.png scad/assembly.scad
-"${openscad_cmd[@]}" --preview=throwntogether --autocenter --viewall \
+"${openscad_cmd[@]}" --preview --autocenter --viewall \
     --projection=p --imgsize=1600,1000 \
     --camera=330,0,45,65,0,25,900 \
     -o png/assembly_with_motor.png scad/assembly_with_motor.scad
