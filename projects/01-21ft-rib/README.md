@@ -65,7 +65,7 @@ The vendor lower unit is too short for the scaled XL transom. The separate print
 ```text
 01-21ft-rib/
 ├── scad/   # Parametric OpenSCAD source
-├── stl/    # 25 ready-to-share printable parts
+├── stl/    # 26 ready-to-share printable parts
 └── png/    # Rendered assembly views
 ```
 
@@ -104,6 +104,7 @@ openscad -o outboard_xl_adapter.stl \
 | Part group | Recommended orientation |
 |---|---|
 | Hull bow, mid, stern | Keel down; verify the 252 mm beam and plate margins |
+| Bow eye | V-saddle against keel; print the internal backing plate separately |
 | Fixed floor and hatch lids | Flat underside on the build plate |
 | Console and bow locker base | Mounting base down |
 | Seat cushions and backrests | Largest flat rear or underside face down |
@@ -126,6 +127,8 @@ openscad -o outboard_xl_adapter.stl \
 - [x] Approved geometry represented in the production assembly.
 - [x] Hull split fits the nominal Bambu Lab A1 build volume.
 - [x] Production export list excludes the abandoned internal drivetrain.
+- [x] Bow eye is project-owned, separately exportable, and shown on the bow assembly.
+- [x] Bow section contains two matching Ø2.2 mm holes at X = 38.5 and 45.5 mm; the eye and internal backing plate compile separately as manifold parts.
 - [x] XL adapter has passed isolated CGAL manifold rendering (`Simple: yes`).
 - [x] Full STL batch exported after the source-layout cleanup.
 - [ ] Every STL sliced and checked in Bambu Studio.

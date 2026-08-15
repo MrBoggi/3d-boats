@@ -6,6 +6,7 @@ use <console.scad>
 use <helm_bench.scad>
 use <aft_bench.scad>
 use <bow_bench.scad>
+use <bow_eye.scad>
 use <floor.scad>
 use <outboard_xl_adapter.scad>
 
@@ -34,6 +35,7 @@ module assembled_rib() {
     helm_bench_stage1_assembly();
     aft_bench_stage1_assembly();
     bow_bench_stage1_assembly();
+    bow_eye_assembly();
 
     if (show_hardware)
         hardware_envelopes();
@@ -79,6 +81,10 @@ else if (selected_part == "bow_rail_starboard")
     bow_single_rail_side_part(1);
 else if (selected_part == "bow_anchor_roller")
     bow_anchor_roller_part();
+else if (selected_part == "bow_eye")
+    bow_eye_part();
+else if (selected_part == "bow_eye_backing")
+    bow_eye_backing_part();
 else if (selected_part == "bow_bench")
     bow_bench_stage1_assembly();
 else if (selected_part == "cockpit_floor_fixed")

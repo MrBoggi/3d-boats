@@ -154,6 +154,14 @@ module positioned_vendor_upper() {
                     vendor_upper_reference();
 }
 
+module positioned_vendor_envelope() {
+    translate([0, 0, mount_center_z])
+        rotate([0, motor_mount_tilt_correction, 0])
+            translate([0, 0, assembly_origin_above_mount])
+                rotate([0, 0, -90])
+                    outboard_1191848_envelope();
+}
+
 module positioned_vendor_lower(drop = 0) {
     translate([0, 0, mount_center_z])
         rotate([0, motor_mount_tilt_correction, 0])
