@@ -217,7 +217,7 @@ def make_project(material: str, index: int, placements: list[Placement], templat
     build = top.find(f"{{{CORE}}}build")
     resources.clear()
     build.clear()
-    build.set(f"{{{PROD}}}UUID", str(uuid.uuid4()))
+    build.set(f"{{{PROD}}}UUID", f"00000002-{str(uuid.uuid4())[9:]}")
 
     model_config = ET.fromstring(files["Metadata/model_settings.config"])
     for child in list(model_config):
@@ -228,29 +228,31 @@ def make_project(material: str, index: int, placements: list[Placement], templat
                        ("gcode_file", "")):
         ET.SubElement(plate_xml, "metadata", key=key, value=value)
 
-    copied: dict[str, tuple[int, int]] = {}
-    object_files: dict[str, bytes] = {}
+    copied: dict[str, int] = {}
     instance_ids: dict[str, int] = {}
     identify = 1
     for placement in placements:
         part = placement.part
         if part.name not in copied:
             resource_id = 2 + len(copied)
-            file_index = 1 + len(copied)
-            copied[part.name] = (resource_id, file_index)
-            path = f"3D/Objects/object_{file_index}.model"
+            copied[part.name] = resource_id
+
+            # Bake the source component transform into the vertices and embed
+            # the mesh directly. Bambu then has no external object to resolve.
             embedded_model = ET.fromstring(part.object_xml)
             embedded_object = embedded_model.find(f".//{{{CORE}}}object")
-            embedded_object.set(f"{{{PROD}}}UUID", str(uuid.uuid4()))
-            object_files[path] = ET.tostring(
-                embedded_model, encoding="utf-8", xml_declaration=True)
-            obj = ET.SubElement(resources, f"{{{CORE}}}object", {
-                "id": str(resource_id), f"{{{PROD}}}UUID": str(uuid.uuid4()), "type": "model"})
-            components = ET.SubElement(obj, f"{{{CORE}}}components")
-            ET.SubElement(components, f"{{{CORE}}}component", {
-                f"{{{PROD}}}path": f"/{path}", "objectid": "1",
-                f"{{{PROD}}}UUID": str(uuid.uuid4()),
-                "transform": " ".join(f"{v:.9g}" for v in part.component_transform)})
+            embedded_object.set("id", str(resource_id))
+            embedded_object.set(f"{{{PROD}}}UUID",
+                                f"00000001-{str(uuid.uuid4())[9:]}")
+            for vertex in embedded_object.findall(f".//{{{CORE}}}vertex"):
+                point = [float(vertex.get(axis, "0")) for axis in ("x", "y", "z")]
+                point = apply_linear(part.component_transform, *point)
+                point = (point[0] + part.component_transform[9],
+                         point[1] + part.component_transform[10],
+                         point[2] + part.component_transform[11])
+                for axis, value in zip(("x", "y", "z"), point):
+                    vertex.set(axis, f"{value:.9g}")
+            resources.append(copy.deepcopy(embedded_object))
 
             with zipfile.ZipFile(part.source) as source_archive:
                 source_config = ET.fromstring(
@@ -258,13 +260,22 @@ def make_project(material: str, index: int, placements: list[Placement], templat
             source_object = source_config.find("object")
             config_object = copy.deepcopy(source_object)
             config_object.set("id", str(resource_id))
+            part_config = config_object.find("part")
+            matrix = part_config.find("metadata[@key='matrix']")
+            if matrix is not None:
+                matrix.set("value", "1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1")
+            for key in ("source_offset_x", "source_offset_y", "source_offset_z"):
+                offset = part_config.find(f"metadata[@key='{key}']")
+                if offset is not None:
+                    offset.set("value", "0")
             model_config.append(config_object)
             instance_ids[part.name] = 0
 
-        resource_id, _ = copied[part.name]
+        resource_id = copied[part.name]
         transform = format_transform(part, placement)
         ET.SubElement(build, f"{{{CORE}}}item", {
-            "objectid": str(resource_id), f"{{{PROD}}}UUID": str(uuid.uuid4()),
+            "objectid": str(resource_id),
+            f"{{{PROD}}}UUID": f"00000002-{str(uuid.uuid4())[9:]}",
             "transform": transform, "printable": "1"})
         instance_id = instance_ids[part.name]
         instance_ids[part.name] += 1
@@ -282,43 +293,40 @@ def make_project(material: str, index: int, placements: list[Placement], templat
     files["3D/3dmodel.model"] = ET.tostring(top, encoding="utf-8", xml_declaration=True)
     files["Metadata/model_settings.config"] = ET.tostring(
         model_config, encoding="utf-8", xml_declaration=True)
-    files.update(object_files)
-    # Remove the template object path if it is not one of our generated paths.
-    for name in list(files):
-        if name.startswith("3D/Objects/") and name not in object_files:
-            del files[name]
 
-    relationships = ET.Element(f"{{{RELS}}}Relationships")
-    for relation_index, path in enumerate(sorted(object_files), 1):
-        ET.SubElement(relationships, f"{{{RELS}}}Relationship", {
-            "Target": f"/{path}", "Id": f"rel-{relation_index}",
-            "Type": "http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"})
-    files["3D/_rels/3dmodel.model.rels"] = ET.tostring(
-        relationships, encoding="utf-8", xml_declaration=True)
+    for name in list(files):
+        if name.startswith("3D/Objects/") or name == "3D/_rels/3dmodel.model.rels":
+            del files[name]
 
     target = OUTPUT / f"trailer_{material}_plate_{index:02d}.3mf"
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
         for name, data in files.items():
             archive.writestr(name, data)
-    validate_project(target, placements, len(object_files))
+    validate_project(target, placements, len(copied))
     return target
 
 
 def validate_project(path: Path, placements: list[Placement], object_count: int):
-    """Fail generation on a malformed archive or missing object reference."""
+    """Fail generation on a malformed archive or a zero-size embedded mesh."""
     with zipfile.ZipFile(path) as archive:
         bad = archive.testzip()
         if bad:
             raise RuntimeError(f"Corrupt member in {path.name}: {bad}")
         top = ET.fromstring(archive.read("3D/3dmodel.model"))
-        rels = ET.fromstring(archive.read("3D/_rels/3dmodel.model.rels"))
         items = top.findall(f".//{{{CORE}}}build/{{{CORE}}}item")
-        components = top.findall(f".//{{{CORE}}}component")
+        objects = top.findall(f".//{{{CORE}}}resources/{{{CORE}}}object")
         if len(items) != len(placements):
             raise RuntimeError(f"Wrong instance count in {path.name}")
-        if len(components) != object_count or len(list(rels)) != object_count:
-            raise RuntimeError(f"Wrong object/reference count in {path.name}")
-
+        if len(objects) != object_count:
+            raise RuntimeError(f"Wrong embedded object count in {path.name}")
+        object_ids = {obj.get("id") for obj in objects}
+        if any(item.get("objectid") not in object_ids for item in items):
+            raise RuntimeError(f"Broken build reference in {path.name}")
+        for obj in objects:
+            vertices = obj.findall(f".//{{{CORE}}}vertex")
+            triangles = obj.findall(f".//{{{CORE}}}triangle")
+            if not vertices or not triangles:
+                raise RuntimeError(f"Zero-size object in {path.name}")
 
 def write_manifest(projects: list[tuple[Path, list[Placement]]]):
     lines = ["# Ferdig arrangerte printplater", "",
