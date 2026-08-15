@@ -335,8 +335,8 @@ prøveutskrift, men er ikke fysisk lasttestet. Kontroller valgt filament og
 byggeplate i Bambu Studio før utskrift.
 
 Undermappen `3mf/plates/` inneholder i tillegg ferdig arrangerte prosjekter
-med full stykkmengde for én henger: tre PETG-plater med totalt 78 printdeler
-og én separat TPU-plate med baugstoppen. `3mf/plates/README.md` viser nøyaktig
+med full stykkmengde for én henger: tre PETG-prosjektfiler med totalt 78 printdeler, fordelt av Bambu Studio
+over seks fysiske platefaner, og én separat TPU-plate med baugstoppen. `3mf/plates/README.md` viser nøyaktig
 innhold på hver plate. Prosjektene genereres reproducerbart med
 `scripts/build_plate_3mf.py`; generatoren kontrollerer arkivintegritet, antall
 instanser og alle interne objektreferanser.

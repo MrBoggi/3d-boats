@@ -1,8 +1,11 @@
 # Ferdig arrangerte printplater
 
 A1, 256 × 256 mm. Antallene dekker én komplett henger.
+Prosjektfilene inneholder totalt 7 fysiske platefaner.
 
 ## trailer_petg_plate_01.3mf
+
+Fysiske platefaner: 2
 
 - `bogie_arm` × 1
 - `crossmember` × 2
@@ -17,12 +20,16 @@ A1, 256 × 256 mm. Antallene dekker én komplett henger.
 
 ## trailer_petg_plate_02.3mf
 
+Fysiske platefaner: 2
+
 - `drawbar_rear` × 1
 - `frame_rail_middle` × 2
 - `splice_plate` × 1
 - `winch_crank` × 1
 
 ## trailer_petg_plate_03.3mf
+
+Fysiske platefaner: 2
 
 - `bogie_arm` × 1
 - `bogie_mount` × 2
@@ -48,5 +55,7 @@ A1, 256 × 256 mm. Antallene dekker én komplett henger.
 - `winch_tower_body` × 1
 
 ## trailer_tpu_plate_01.3mf
+
+Fysiske platefaner: 1
 
 - `bow_stop` × 1

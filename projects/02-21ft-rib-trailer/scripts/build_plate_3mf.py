@@ -13,6 +13,7 @@ import json
 import math
 import re
 import shutil
+import subprocess
 import tempfile
 import uuid
 import zipfile
@@ -328,14 +329,45 @@ def validate_project(path: Path, placements: list[Placement], object_count: int)
             if not vertices or not triangles:
                 raise RuntimeError(f"Zero-size object in {path.name}")
 
+def arrange_with_bambu(projects: list[tuple[Path, list[Placement]]]):
+    """Use Bambu Studio's real clearance rules for final physical plates."""
+    if shutil.which("flatpak-spawn"):
+        command = ["flatpak-spawn", "--host", "flatpak", "run",
+                   "com.bambulab.BambuStudio"]
+    elif shutil.which("flatpak"):
+        command = ["flatpak", "run", "com.bambulab.BambuStudio"]
+    else:
+        raise RuntimeError(
+            "Bambu Studio Flatpak is required for collision-safe final arrangement")
+
+    for path, _ in projects:
+        arranged = path.with_name(f".{path.stem}_arranged.3mf")
+        subprocess.run(command + [
+            "--ensure-on-bed", "--arrange", "1", "--allow-rotations",
+            "--export-3mf", str(arranged.resolve()), str(path.resolve())
+        ], check=True)
+        if not arranged.is_file() or arranged.stat().st_size == 0:
+            raise RuntimeError(f"Bambu Studio did not create {arranged.name}")
+        arranged.replace(path)
+
+
+def physical_plate_count(path: Path) -> int:
+    with zipfile.ZipFile(path) as archive:
+        config = ET.fromstring(archive.read("Metadata/model_settings.config"))
+    return len(config.findall("plate"))
+
+
 def write_manifest(projects: list[tuple[Path, list[Placement]]]):
+    total_physical = sum(physical_plate_count(path) for path, _ in projects)
     lines = ["# Ferdig arrangerte printplater", "",
-             "A1, 256 × 256 mm. Antallene dekker én komplett henger.", ""]
+             "A1, 256 × 256 mm. Antallene dekker én komplett henger.",
+             f"Prosjektfilene inneholder totalt {total_physical} fysiske platefaner.", ""]
     for path, placements in projects:
         counts: dict[str, int] = {}
         for placement in placements:
             counts[placement.part.name] = counts.get(placement.part.name, 0) + 1
-        lines += [f"## {path.name}", ""]
+        lines += [f"## {path.name}", "",
+                  f"Fysiske platefaner: {physical_plate_count(path)}", ""]
         lines += [f"- `{name}` × {count}" for name, count in sorted(counts.items())]
         lines.append("")
     (OUTPUT / "README.md").write_text("\n".join(lines), encoding="utf-8")
@@ -358,8 +390,9 @@ def main():
                                   SOURCE / template_name)
             projects.append((target, placements))
             print(f"{target.name}: {len(placements)} objects")
+    arrange_with_bambu(projects)
     write_manifest(projects)
-    print(f"Created {len(projects)} plate projects in {OUTPUT}")
+    print(f"Created {len(projects)} collision-safe plate projects in {OUTPUT}")
 
 
 if __name__ == "__main__":
