@@ -5,7 +5,8 @@ module coupler_mount_adapter() {
         union() {
             cube(coupler_adapter_size, center = true);
             translate([coupler_adapter_size[0] / 2
-                    + coupler_tongue_length / 2 - boolean_overlap, 0, 0])
+                    + coupler_tongue_length / 2 - boolean_overlap, 0,
+                    coupler_tongue_center_z])
                 cube(coupler_tongue_size, center = true);
         }
         rotate([0, 90, 0])

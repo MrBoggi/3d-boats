@@ -28,8 +28,15 @@ rail_center_y = frame_outer_width / 2 - rail_size[1] / 2;
 frame_bottom_z = 22;
 frame_center_z = frame_bottom_z + rail_size[2] / 2;
 crossmember_size = [12, frame_outer_width, 18];
-crossmember_x = [270, 430, 585];
-rear_accessory_x = 585;
+crossmember_inner_width = frame_outer_width - 2 * rail_size[1]
+    - 2 * fit_clearance;
+rear_accessory_x = frame_rear_x + crossmember_size[0] / 2
+    + fit_clearance;
+crossmember_x = [270, 430, rear_accessory_x];
+crossmember_joint_plate_thickness = 3;
+crossmember_joint_plate_boss_diameter = 10;
+crossmember_joint_rail_x_offset = 8;
+crossmember_joint_cross_inset_y = 11;
 rear_light_y = 106;
 rear_light_housing_size = [8, 38, 20];
 rear_light_lens_size = [3, 34, 16];
@@ -156,7 +163,7 @@ fender_bracket_hole_local_z = wheel_axis_z
     + fender_mount_hole_local_z - fender_bracket_z;
 fender_mount_hole_diameter = 3.4;
 
-keel_roller_x = [110, 270, 430, 585];
+keel_roller_x = [110, 270, 430, rear_accessory_x];
 keel_roller_local_keel_z = [28.9917, 3.2742, 0, 0];
 keel_roller_keel_z = [for (keel_z = keel_roller_local_keel_z)
     boat_z_offset + keel_z];
@@ -197,13 +204,15 @@ side_roller_profile_stations = [
 side_roller_width = 18;
 side_roller_axle_hole = 3.2;
 side_roller_spacing_x = 32;
-side_roller_cradle_size = [48, 26, 8];
-side_roller_holder_size = [12, 26, 5];
+side_roller_cradle_size = [48, 26, 4];
+side_roller_cradle_body_z = 9;
+side_roller_cradle_lug_size = [4, 16, 8];
+side_roller_holder_size = [13, 26, 6];
 side_roller_holder_lug_wall = 4;
+side_roller_holder_pivot_ear_thickness = 4;
 side_roller_holder_pivot_hole = 3.2;
-side_roller_holder_pivot_z = 3;
-side_roller_holder_mount_z = 6.7;
-side_roller_holder_axis_z = 13;
+side_roller_holder_mount_z = 14.2; // 0.2 mm gods over M3-hullet; unngaar tangent/non-manifold topp
+side_roller_holder_axis_z = 9;
 side_roller_wobble_limit = 10;
 side_roller_work_angles = [[0, 0], [0, 0]];
 side_roller_debug_angles = [[-6, 6], [-6, 6]];
@@ -243,6 +252,11 @@ support_receiver_wall = 3;
 support_adjustment_pitch = 8;
 support_adjustment_count = 3;
 support_pad_pivot_hole = 3.2;
+support_post_pivot_boss_diameter = 10;
+support_post_pivot_boss_width = 10;
+support_pad_pivot_clearance = 0.4;
+support_pad_pivot_ear_thickness = 4;
+support_pad_pivot_ear_height = 16;
 support_pad_bracket_width = 20;
 drawbar_beam_width = 12;
 v_split_x = 60;
@@ -257,12 +271,14 @@ v_rail_joint_rear_x = v_rear_x + 22;
 v_joint_hole_diameter = 3.4;
 v_joint_hole_spacing = 10;
 v_joint_overlap = 10;
+v_joint_lap_clearance = 0.3;
 winch_bridge_x = 34;
 drawbar_beam_height = 18;
 coupler_size = [32, 24, 14];
 coupler_adapter_size = coupler_size;
+coupler_adapter_setback = 4;
 coupler_adapter_center_x = trailer_front_x
-    + coupler_adapter_size[0] / 2;
+    + coupler_adapter_size[0] / 2 - coupler_adapter_setback;
 coupler_axis_z = frame_bottom_z + coupler_adapter_size[2] / 2;
 coupler_m3_clearance = 3.4;
 coupler_bolt_head_af = 5.5;
@@ -270,7 +286,13 @@ coupler_bolt_head_depth = 3;
 coupler_stud_diameter = 3;
 coupler_stud_projection = 9;
 coupler_tongue_length = 18;
-coupler_tongue_size = [coupler_tongue_length, 12, drawbar_beam_height];
+coupler_lap_clearance = 0.3;
+coupler_tongue_height = drawbar_beam_height / 2
+    - coupler_lap_clearance / 2;
+coupler_tongue_size = [coupler_tongue_length, 12,
+    coupler_tongue_height];
+coupler_tongue_center_z = -(drawbar_beam_height
+    - coupler_tongue_height) / 2;
 coupler_frame_hole_spacing = 8;
 coupler_frame_hole_first_x = coupler_adapter_size[0] / 2 + 6;
 coupler_frame_hole_diameter = 3.4;
@@ -366,8 +388,9 @@ assert(bogie_pivot_bolt_length >= bogie_mount_size[1]
     "M3 bogie pivot bolt is too short for clevis and captive nut");
 assert(track_width / 2 - wheel_width / 2 > boat_beam / 2,
     "Wheels do not clear the boat beam");
-assert(frame_rear_x == rear_accessory_x,
-    "Main rails must terminate at the rear accessory crossmember");
+assert(abs(frame_rear_x + fit_clearance
+        - (rear_accessory_x - crossmember_size[0] / 2)) < 0.001,
+    "Rear crossmember must retain print clearance from the rail ends");
 assert(v_apex_x < v_split_x && v_split_x < v_rear_x,
     "V-frame stations must increase from coupler to rear joint");
 assert(v_frame_end_x < v_rear_x && rail_front_x > v_rear_x,
@@ -375,6 +398,11 @@ assert(v_frame_end_x < v_rear_x && rail_front_x > v_rear_x,
 assert(v_joint_hole_spacing + v_joint_hole_diameter
         <= 2 * v_joint_overlap,
     "Two V-joint bolts do not fit inside the overlap");
+assert(v_joint_lap_clearance >= fit_clearance,
+    "V half-lap has insufficient vertical print clearance");
+assert(drawbar_beam_height / 2 - v_joint_lap_clearance / 2
+        > v_joint_hole_diameter,
+    "V half-lap leaves too little material around its bolts");
 assert(v_rail_joint_front_x < v_rear_x
         && v_rail_joint_rear_x > v_rear_x,
     "V-to-rail joint plate must bridge the front crossmember");
@@ -403,6 +431,10 @@ assert(coupler_ball_diameter >= 5.8 && coupler_ball_diameter <= 6.0,
 assert(coupler_tongue_length > coupler_frame_hole_first_x
         + coupler_frame_hole_spacing - coupler_adapter_size[0] / 2,
     "Coupler tongue is too short for both frame bolts");
+assert(coupler_lap_clearance >= fit_clearance,
+    "Coupler half-lap has insufficient vertical print clearance");
+assert(coupler_tongue_height > coupler_frame_hole_diameter,
+    "Coupler tongue leaves too little material around its bolts");
 assert(winch_post_top[0] < winch_post_base[0],
     "Winch post must lean toward the trailer front");
 assert(bow_stop_center[0] > winch_axis_x,
@@ -470,8 +502,15 @@ assert(side_support_debug_clearance >= side_support_work_clearance,
 assert(side_roller_holder_axis_z > side_roller_diameter / 2,
     "Wobble roller collides with its secondary pivot");
 assert(side_roller_holder_mount_z - side_roller_holder_size[2] / 2
-        > side_roller_cradle_size[2] / 2,
-    "Wobble holder overlaps the main cradle in neutral position");
+        > side_roller_cradle_body_z + side_roller_cradle_size[2] / 2,
+    "Wobble holder overlaps the raised cradle body in neutral position");
+assert(2 * (support_pad_pivot_clearance + support_pad_pivot_ear_thickness)
+        + support_post_pivot_boss_width <= side_roller_cradle_size[1],
+    "Cradle pivot ears do not fit around the support post");
+assert(side_roller_cradle_body_z
+        - side_roller_cradle_size[1] / 2 * sin(side_support_angle)
+        - side_roller_cradle_size[2] / 2 * cos(side_support_angle) > 0,
+    "Tilted cradle body collides with the top of its support post");
 assert(side_roller_diameter > side_roller_end_diameter,
     "Side wobble roller must have a convex barrel profile");
 assert(side_roller_profile_stations[0][1]

@@ -21,7 +21,8 @@ mkdir -p stl png
 
 parts=(
     frame_rail_middle frame_rail_rear splice_plate v_rail_joint_plate
-    coupler_mount_adapter crossmember rear_accessory_crossmember drawbar_front drawbar_rear bogie_arm bogie_mount wheel_hex_adapter tandem_fender fender_mount_bracket
+    crossmember_joint_plate_mid crossmember_joint_plate_rear
+    coupler_mount_adapter crossmember crossmember_mid rear_accessory_crossmember drawbar_front drawbar_rear bogie_arm bogie_mount wheel_hex_adapter tandem_fender fender_mount_bracket
     keel_roller keel_roller_bracket_front keel_roller_bracket_mid_front
     keel_roller_bracket_mid_rear keel_roller_bracket_rear
     side_support_receiver side_support_post_front side_support_post_rear

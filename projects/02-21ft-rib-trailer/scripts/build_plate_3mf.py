@@ -36,9 +36,12 @@ PETG_QUANTITIES = {
     "drawbar_rear": 1,
     "frame_rail_middle": 2,
     "frame_rail_rear": 2,
-    "splice_plate": 4,
+    "splice_plate": 2,
     "v_rail_joint_plate": 4,
-    "crossmember": 2,
+    "crossmember": 1,
+    "crossmember_mid": 1,
+    "crossmember_joint_plate_mid": 4,
+    "crossmember_joint_plate_rear": 4,
     "rear_accessory_crossmember": 1,
     "coupler_mount_adapter": 1,
     "bogie_arm": 2,
@@ -288,6 +291,10 @@ def make_project(material: str, index: int, placements: list[Placement], templat
     ET.SubElement(model_config, "assemble")
 
     settings = json.loads(files["Metadata/project_settings.config"])
+    # Full plates mix self-supporting and overhanging parts; normal(auto)
+    # support prevents floating-region warnings while remaining selective.
+    settings["enable_support"] = "1"
+    settings["support_type"] = "normal(auto)"
     settings["printable_area"] = ["0x0", "256x0", "256x256", "0x256"]
     settings["bed_exclude_area"] = []
     files["Metadata/project_settings.config"] = json.dumps(settings, indent=4).encode() + b"\n"
@@ -332,8 +339,8 @@ def validate_project(path: Path, placements: list[Placement], object_count: int)
 def arrange_with_bambu(projects: list[tuple[Path, list[Placement]]]):
     """Use Bambu Studio's real clearance rules for final physical plates."""
     if shutil.which("flatpak-spawn"):
-        command = ["flatpak-spawn", "--host", "flatpak", "run",
-                   "com.bambulab.BambuStudio"]
+        command = ["flatpak-spawn", "--host", "xvfb-run", "-a",
+                   "flatpak", "run", "com.bambulab.BambuStudio"]
     elif shutil.which("flatpak"):
         command = ["flatpak", "run", "com.bambulab.BambuStudio"]
     else:
@@ -342,10 +349,15 @@ def arrange_with_bambu(projects: list[tuple[Path, list[Placement]]]):
 
     for path, _ in projects:
         arranged = path.with_name(f".{path.stem}_arranged.3mf")
-        subprocess.run(command + [
-            "--ensure-on-bed", "--arrange", "1", "--allow-rotations",
-            "--export-3mf", str(arranged.resolve()), str(path.resolve())
-        ], check=True)
+        try:
+            subprocess.run(command + [
+                "--ensure-on-bed", "--arrange", "1", "--allow-rotations",
+                "--export-3mf", str(arranged.resolve()), str(path.resolve())
+            ], check=True)
+        except subprocess.CalledProcessError as error:
+            print(f"Warning: Bambu auto-arrange failed ({error.returncode}); "
+                  "keeping the validated 6 mm rectangle packing.")
+            continue
         if not arranged.is_file() or arranged.stat().st_size == 0:
             raise RuntimeError(f"Bambu Studio did not create {arranged.name}")
         arranged.replace(path)

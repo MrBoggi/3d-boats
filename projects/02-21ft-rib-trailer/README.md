@@ -8,7 +8,7 @@ med roterende hjul, vippbar boggi og justerbare skrogstøtter.
 ## Status
 
 Detaljert digital review-versjon er implementert. Den inneholder komplett
-sammenstilling, direkte skrogreferanse fra prosjekt 01 og 32 separate
+sammenstilling, direkte skrogreferanse fra prosjekt 01 og 35 separate
 eksportmål. En forstørret todelt V-front, rammeskjøter, tverrbjelkefester,
 boggi-endestopp, M4-hjulaksler, synlige M4-muttere og separate 12 mm sekskantadaptere med avstandshylse,
 justerbare støtter og en fremoverlent, avstivet vinsjstolpe med V-stopp på båtsiden er modellert. Modellen er kontrollert
@@ -147,7 +147,7 @@ Mekaniske endestopp begrenser vinkelutslaget og hindrer at dekk treffer rammen.
 
 ### 5. Tilpass kjølruller og sidestøtter
 
-Plasser kjølruller ved omtrent X = 110, 270, 430 og 585 mm i båtens koordinater,
+Plasser kjølruller ved omtrent X = 110, 270, 430 og 591,3 mm i båtens koordinater,
 og finjuster dem mot den faktiske kjølkurven. Sidestøttene plasseres parvis nær
 de to midtre/akterste sonene, med vinkel bestemt av skrogets lokale V-flate.
 Støttehodene skal være utskiftbare og ha flater for TPU-, filt- eller
@@ -230,12 +230,13 @@ Etter visuell godkjenning eksporteres hele settet og tre PNG-visninger med:
 
 ## Implementerte printmål
 
-- Ett 164 mm midtsegment og ett 145 mm aktersegment per hovedvange; begge slutter ved X = 585 mm.
-- Fire utvendige skjøtelasker rundt vangskjøten ved X = 440 mm.
-- To standardtverrbjelker ved X = 270 og 430 mm og én tilpasset lysbjelke ved X = 585 mm. Den tidligere tverrbjelken i vangskjøten ved X = 440 mm er fjernet, slik at skjøteboltene ikke ligger i en delesøm.
+- Ett 164 mm midtsegment og ett 145 mm aktersegment per hovedvange; vangene slutter ved X = 585 mm.
+- To utvendige skjøtelasker, én på yttersiden av hver vange ved X = 440 mm. Innvendige lasker er fjernet fordi de kolliderte med midtbjelkens festeområde.
+- Én fullbredde frontbjelke ved X = 270 mm, én egen forkortet midtbjelke ved X = 430 mm og én tilpasset lysbjelke ved X = 591,3 mm. Den tidligere tverrbjelken i vangskjøten ved X = 440 mm er fjernet, slik at skjøteboltene ikke ligger i en delesøm.
+- Midtbjelken har 0,3 mm sideklaring til vangene; lysbjelken har 0,3 mm endeklaring bak vangene. Hver skjøt bruker egne 3 mm over-/underplater på begge sider, totalt fire plater per bjelke.
 - V-bakdelen stopper plant ved forkanten av tverrbjelken ved X = 270 mm, og hovedvangene starter ved bakkanten. Fire identiske 3 mm skjøteplater, én over og én under på hver side, forbinder V-arm, tverrbjelke og hovedvange med tre M3-bolter per side.
-- Todelt, forstørret V-front med to M3-bolter per arm i skjøten, integrerte broer og langsgående senterbjelke frem til vinsjtverrbjelken.
-- Separat frontadapter med 18 mm overlapp, to M3-rammebolter og aksial M3-stud for kjøpt 6 mm trailerklør.
+- Todelt, forstørret V-front med en reell halv-i-halv-skjøt, 0,3 mm vertikal printklaring og to M3-bolter per arm, integrerte broer og langsgående senterbjelke frem til vinsjtverrbjelken.
+- Separat frontadapter med 18 mm halv-i-halv-tunge, 0,3 mm vertikal klaring, to M3-rammebolter og aksial M3-stud for kjøpt 6 mm trailerklør.
 - To boggiarmer og to åpne clevisfester med 4 mm inner-/ytterører, 1,2 mm lagergap, 0,8 mm skiver og fanget M3-mutter. Hvert feste har toppflens og to vertikale M3-bolter gjennom hovedvangen; endestoppene gir verifisert ±12° utslag.
 - Fire separate PETG/ASA-sekskantadaptere for kjøpehjul med 12 mm feste og integrert Ø10 mm avstandshylse.
 - Alle bærende rammebjelker har 12 × 18 mm profil, slik at V-front, hovedvanger og tverrbjelker møtes med plane over- og undersider uten påbygde kiler.
@@ -249,6 +250,14 @@ Etter visuell godkjenning eksporteres hele settet og tre PNG-visninger med:
 
 Støttehjul, innføringsruller og stroppeører er ikke med i denne
 review-versjonen.
+
+## Verifiserte mekaniske grensesnitt
+
+Etter første fysiske prøveutskrift ble den tidligere geometriske overlappingen mellom `drawbar_front` og `drawbar_rear` fjernet. Delene skal ikke skrus oppå hverandre som to massive bjelker. De har nå komplementære halv-i-halv-anlegg med 0,3 mm nominell vertikal klaring; de fire M3-hullene klemmer halvdelene sammen. Koblingsadapterens tunge bruker samme prinsipp mot senterbjelken.
+
+Midtbjelken ender 0,3 mm innenfor hovedvangene og lysbjelken starter 0,3 mm bak vangeendene. Begge forbindes med separate 3 mm plater over og under, to per side. Dermed finnes det ikke lenger massive bjelkevolumer som opptar samme plass. Sidestøtten har et rundt hovedpivotnav i en gaffel, og hver av de to siderullene har sin egen sekundærpivot med fri knastklaring.
+
+Kjør `scripts/check_joint_interfaces.sh` etter geometriendringer. Kontrollen rendrer alle 35 printfiler og krever `Simple: yes`, og den krever tomt kollisjonsvolum i åtte kritiske grensesnitt. Dette er digital passkontroll; den nye V-skjøten og de nye tverrbjelkeplatene må fortsatt bekreftes med små fysiske prøveutskrifter før hele rammen printes.
 
 ## Printorientering
 
@@ -273,7 +282,7 @@ review-versjonen.
 | Siderulle | Én rund side ned |
 | Vinsjtårn | Fot/anleggsflate ned; lokal støtte kan bli nødvendig |
 
-Alle 32 eksportdeler er eksportert til STL og kontrollmålt fra den faktiske
+Alle 35 eksportdeler er eksportert til STL og kontrollmålt fra den faktiske
 triangelgeometrien. Samtlige kompilerer som `Simple: yes` og ligger innenfor
 256 × 256 × 256 mm. Største todimensjonale fotavtrykk er `drawbar_rear`
 på ca. 214 × 217 mm; tverrbjelkene er 220 mm lange. Alle delene er også
@@ -281,7 +290,7 @@ slicet digitalt på korrekt A1-plate som beskrevet under.
 
 ## Slicer-verifikasjon
 
-Alle 32 STL-er er slicet med Bambu Studio 2.7.1.62 Flatpak mot Bambu Lab A1,
+Alle 35 STL-er er slicet med Bambu Studio 2.7.1.62 Flatpak mot Bambu Lab A1,
 0,4 mm dyse og 0,20 mm Standard. De strukturelle delene ble kontrollert med
 Generic PETG; `bow_stop` ble i tillegg kontrollert med Bambu TPU 95A. Alle
 deler ble beholdt i dokumentert eksportorientering, med kun platearrangering
@@ -315,7 +324,7 @@ trailer uten båt ble til slutt CGAL-rendret som `Simple: yes`.
 
 ## Permanente 3MF-filer
 
-Mappen `3mf/` inneholder én ferdig Bambu Studio-prosjektfil for hver av de 32
+Mappen `3mf/` inneholder én ferdig Bambu Studio-prosjektfil for hver av de 35
 unike eksportdelene. Hver fil inneholder én kopi av delen og kan åpnes direkte
 i Bambu Studio. Kopiantall velges ved utskrift etter delelisten/monteringen.
 
@@ -329,17 +338,22 @@ Prototypeprofilene er:
   `side_double_roller_cradle`, `side_roller_wobble_holder`, `tandem_fender`,
   `wheel_hex_adapter`, `winch_tower_body` og TPU-delen `bow_stop`.
 
-Alle 32 pakkede filer er kontrollslicet på A1-plate 256 × 256 mm uten
+Alle 35 pakkede filer er kontrollslicet på A1-plate 256 × 256 mm uten
 gjenværende advarsler. Innstillingene er et sterkt utgangspunkt for
 prøveutskrift, men er ikke fysisk lasttestet. Kontroller valgt filament og
 byggeplate i Bambu Studio før utskrift.
 
 Undermappen `3mf/plates/` inneholder i tillegg ferdig arrangerte prosjekter
-med full stykkmengde for én henger: tre PETG-prosjektfiler med totalt 78 printdeler, fordelt av Bambu Studio
-over seks fysiske platefaner, og én separat TPU-plate med baugstoppen. `3mf/plates/README.md` viser nøyaktig
+med full stykkmengde for én henger: fire PETG-prosjektfiler med totalt 84 printdeler, fordelt over fire fysiske platefaner, og én separat TPU-plate med baugstoppen. `3mf/plates/README.md` viser nøyaktig
 innhold på hver plate. Prosjektene genereres reproducerbart med
 `scripts/build_plate_3mf.py`; generatoren kontrollerer arkivintegritet, antall
 instanser og alle interne objektreferanser.
+
+## Restutskrift etter fysisk prøveprint
+
+Et eget restsett ligger i `3mf/remaining_after_trial/`. Det bygger på at begge fysiske faner i de gamle PETG-prosjektene 01 og 02 er printet, mens bare fane 1 i gamle prosjekt 03 er printet. `winch_tower_body` er eksplisitt tatt med fordi delen manglet i den fysiske utskriften, selv om den gamle prosjektmetadataen plasserte den på fane 1.
+
+Restsettet inneholder 54 PETG-deler og én TPU-baugstopp fordelt på seks fysiske faner. Det inkluderer både tidligere uprintede deler og alle deler som må printes på nytt etter halv-i-halv-skjøten, de nye tverrbjelkefestene og redesignet sidestøtte. Alle seks faner er kontrollslicet med returkode 0 og uten advarsler. Regenerer settet med `python3 scripts/build_remaining_after_trial.py`.
 
 ## Visuell service-review
 
@@ -417,8 +431,8 @@ gjenger modelleres direkte; bruk klaringshull, mutterlommer eller varmeinnsatser
 ## Digital verifikasjon
 
 - [x] Komplett trailer uten båt rendret med CGAL: `Simple: yes`.
-- [x] Alle 32 separate eksportmål rendret: `Simple: yes`.
-- [x] Faktiske STL-avgrensninger for alle 32 eksportdeler er målt; største
+- [x] Alle 35 separate eksportmål rendret: `Simple: yes`.
+- [x] Faktiske STL-avgrensninger for alle 35 eksportdeler er målt; største
   fotavtrykk er 214 × 217 mm og alle tre akser er under 256 mm.
 - [x] Isometrisk PNG oppdatert med den faktiske RIB-referansen.
 - [x] Hardware-debug dekker ramme, boggifestebolter, hjul, rullefester og aksler, støtteflenser og pivoter, skjermfester, vinsjstag, baugstopp, lys, linser og skilt.
@@ -434,7 +448,7 @@ gjenger modelleres direkte; bruk klaringshull, mutterlommer eller varmeinnsatser
 - [ ] Visuell eier-review av proporsjoner og skrogkontakt.
 - [x] Visuell service-review utført med fokuserte bilder; hjul, støtter, vinsj og baklys har identifisert servicetilgang.
 - [x] Boggifestet redesignet som clevis med komplett M3 × 18 mm pivot; arm er fri til ±11°, stopper ved ±12°, og clevis/pivot/hjulsveip er tomme mot skjermsystemet.
-- [x] Alle 32 permanente 3MF-filer slicet med Bambu Studio 2.7.1.62 for A1/0,4 mm uten advarsler; sju PETG-deler og TPU-baugstoppen bruker normal automatisk støtte.
+- [x] Alle 35 permanente 3MF-filer slicet med Bambu Studio 2.7.1.62 for A1/0,4 mm uten advarsler; sju PETG-deler og TPU-baugstoppen bruker normal automatisk støtte.
 - [ ] Fysiske testutskrifter av skjøt, hjuladapter, boggi og justerbar støtte.
 - [ ] Last-, klarings- og kuletrykktest med ferdig båt.
 

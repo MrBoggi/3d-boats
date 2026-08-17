@@ -100,15 +100,28 @@ module side_support_post(index = 0, side = 1) {
     assert(index >= 0 && index < len(side_support_x));
     post_bottom_z = frame_bottom_z + crossmember_size[2]
         + support_receiver_wall;
-    post_height = side_support_top_z[index] - post_bottom_z;
+    body_top_z = side_support_top_z[index]
+        - support_post_pivot_boss_diameter / 2 - 3;
+    post_height = body_top_z - post_bottom_z;
     difference() {
-        translate([side_support_x[index], side * side_support_y,
-                post_bottom_z + post_height / 2])
-            cube([support_post_size[0], support_post_size[1], post_height],
-                center = true);
+        union() {
+            translate([side_support_x[index], side * side_support_y,
+                    post_bottom_z + post_height / 2])
+                cube([support_post_size[0], support_post_size[1], post_height],
+                    center = true);
+            translate([side_support_x[index], side * side_support_y,
+                    side_support_top_z[index]])
+                rotate([side * side_support_angle,
+                        side_support_pitch[index], 0])
+                    rotate([90, 0, 0])
+                        cylinder(h = support_post_pivot_boss_width,
+                            d = support_post_pivot_boss_diameter,
+                            center = true);
+        }
         for (hole_index = [0 : support_adjustment_count - 1])
             translate([side_support_x[index], side * side_support_y,
-                    frame_bottom_z + crossmember_size[2] + support_adjustment_pitch
+                    frame_bottom_z + crossmember_size[2]
+                        + support_adjustment_pitch
                         + hole_index * support_adjustment_pitch])
                 rotate([90, 0, 0])
                     cylinder(h = support_post_size[1]
@@ -116,9 +129,12 @@ module side_support_post(index = 0, side = 1) {
                         d = support_adjustment_hole, center = true);
         translate([side_support_x[index], side * side_support_y,
                 side_support_top_z[index]])
-            rotate([90, 0, 0])
-                cylinder(h = support_post_size[1] + 2 * boolean_overlap,
-                    d = support_pad_pivot_hole, center = true);
+            rotate([side * side_support_angle,
+                    side_support_pitch[index], 0])
+                rotate([90, 0, 0])
+                    cylinder(h = support_post_pivot_boss_width
+                            + 2 * boolean_overlap,
+                        d = support_pad_pivot_hole, center = true);
     }
 }
 
@@ -138,21 +154,35 @@ module side_support_roller() {
 }
 
 module side_roller_wobble_holder() {
+    pivot_ear_x = side_roller_cradle_lug_size[0] / 2
+        + fit_clearance + side_roller_holder_pivot_ear_thickness / 2;
+    axle_lug_y = side_roller_width / 2
+        + side_roller_holder_lug_wall / 2 + fit_clearance;
     difference() {
         union() {
-            translate([0, 0, side_roller_holder_pivot_z])
-                cube(side_roller_holder_size, center = true);
+            for (ear_x = [-pivot_ear_x, pivot_ear_x]) {
+                translate([ear_x, 0, 0])
+                    cube([side_roller_holder_pivot_ear_thickness,
+                        side_roller_cradle_lug_size[1],
+                        side_roller_holder_size[2]], center = true);
+                for (roller_side = [-1, 1])
+                    hull() {
+                        translate([ear_x, roller_side * 5, 1])
+                            cube([side_roller_holder_pivot_ear_thickness,
+                                4, 4], center = true);
+                        translate([ear_x, roller_side * axle_lug_y,
+                                side_roller_holder_axis_z])
+                            cube([side_roller_holder_pivot_ear_thickness,
+                                side_roller_holder_lug_wall, 8], center = true);
+                    }
+            }
+            // Akselbroen ligger over vuggeknasten; armene kan derfor
+            // vippe fritt uten å skjære gjennom den sentrale knasten.
             for (roller_side = [-1, 1])
-                translate([0,
-                        roller_side * (side_roller_width / 2
-                            + side_roller_holder_lug_wall / 2 + fit_clearance),
-                        (side_roller_holder_pivot_z
-                            + side_roller_holder_axis_z) / 2])
+                translate([0, roller_side * axle_lug_y,
+                        side_roller_holder_axis_z])
                     cube([side_roller_holder_size[0],
-                        side_roller_holder_lug_wall,
-                        side_roller_holder_axis_z
-                            - side_roller_holder_pivot_z
-                            + side_roller_diameter / 2], center = true);
+                        side_roller_holder_lug_wall, 8], center = true);
         }
         rotate([0, 90, 0])
             cylinder(h = side_roller_holder_size[0] + 2 * boolean_overlap,
@@ -167,9 +197,24 @@ module side_roller_wobble_holder() {
 }
 
 module side_double_roller_cradle() {
+    ear_y = support_post_pivot_boss_width / 2
+        + support_pad_pivot_clearance
+        + support_pad_pivot_ear_thickness / 2;
     difference() {
         union() {
-            cube(side_roller_cradle_size, center = true);
+            translate([0, 0, side_roller_cradle_body_z])
+                cube(side_roller_cradle_size, center = true);
+            for (roller_x = [-side_roller_spacing_x / 2,
+                    side_roller_spacing_x / 2])
+                translate([roller_x, 0,
+                        side_roller_cradle_body_z
+                            + side_roller_cradle_lug_size[2] / 2 - 1])
+                    cube(side_roller_cradle_lug_size, center = true);
+            for (ear_side = [-1, 1])
+                translate([0, ear_side * ear_y, 0])
+                    cube([support_pad_bracket_width,
+                        support_pad_pivot_ear_thickness,
+                        support_pad_pivot_ear_height], center = true);
             for (roller_x = [-side_roller_spacing_x / 2,
                     side_roller_spacing_x / 2])
                 for (stop_side = [-1, 1]) {
@@ -184,7 +229,8 @@ module side_double_roller_cradle() {
                     translate([roller_x,
                             stop_side * (side_roller_holder_size[1] / 2
                                 + side_roller_stop_clearance / 2),
-                            side_roller_cradle_size[2] / 2
+                            side_roller_cradle_body_z
+                                + side_roller_cradle_size[2] / 2
                                 + side_roller_stop_foot_height / 2
                                 - boolean_overlap])
                         cube([side_roller_holder_size[0],
@@ -194,7 +240,8 @@ module side_double_roller_cradle() {
                 }
         }
         rotate([90, 0, 0])
-            cylinder(h = side_roller_cradle_size[1] + 2 * boolean_overlap,
+            cylinder(h = 2 * ear_y + support_pad_pivot_ear_thickness
+                    + 2 * boolean_overlap,
                 d = support_pad_pivot_hole, center = true);
         for (roller_x = [-side_roller_spacing_x / 2,
                 side_roller_spacing_x / 2])

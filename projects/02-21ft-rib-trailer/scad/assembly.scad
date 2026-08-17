@@ -57,6 +57,12 @@ else if (selected_part == "v_rail_joint_plate")
     v_rail_joint_plate_export();
 else if (selected_part == "crossmember")
     crossmember_export(0);
+else if (selected_part == "crossmember_mid")
+    crossmember_export(1);
+else if (selected_part == "crossmember_joint_plate_mid")
+    crossmember_joint_plate_export(1);
+else if (selected_part == "crossmember_joint_plate_rear")
+    crossmember_joint_plate_export(2);
 else if (selected_part == "rear_accessory_crossmember")
     crossmember_export(len(crossmember_x) - 1);
 else if (selected_part == "crossmember_front")
@@ -194,6 +200,42 @@ else if (selected_part == "rear_light_lens")
     rear_light_lens();
 else if (selected_part == "license_plate_holder")
     license_plate_holder();
+else if (selected_part == "drawbar_joint_collision")
+    intersection() {
+        drawbar_front();
+        drawbar_rear();
+    }
+else if (selected_part == "coupler_drawbar_collision")
+    intersection() {
+        drawbar_front();
+        translate([coupler_adapter_center_x, 0, coupler_axis_z])
+            coupler_mount_adapter();
+    }
+else if (selected_part == "crossmember_frame_collision")
+    intersection() {
+        union()
+            for (index = [1 : 2])
+                for (side = [-1, 1])
+                    rail_segment(index, side);
+        union()
+            for (index = [1 : len(crossmember_x) - 1])
+                crossmember(index);
+    }
+else if (selected_part == "side_support_pivot_collision")
+    intersection() {
+        side_support_post(0, 1);
+        translate([side_support_x[0], side_support_y,
+                side_support_top_z[0]])
+            rotate([side_support_angle, side_support_pitch[0], 0])
+                side_double_roller_cradle();
+    }
+else if (selected_part == "side_wobble_pivot_collision")
+    intersection() {
+        side_double_roller_cradle();
+        translate([-side_roller_spacing_x / 2, 0,
+                side_roller_holder_mount_z])
+            side_roller_wobble_holder();
+    }
 else if (selected_part == "hardware_debug")
     trailer_hardware_envelopes();
 else

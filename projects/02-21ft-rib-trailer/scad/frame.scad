@@ -45,11 +45,13 @@ module rail_segment(index = 0, side = 1) {
             rail_splice_hole((index + 1) * frame_segment_length
                 - splice_hole_spacing / 2, side);
 
-        for (member_x = crossmember_x)
-            if (member_x >= segment_start_x && member_x <= segment_end_x)
-                translate([member_x, side * rail_center_y, frame_center_z])
+        for (member_index = [1 : len(crossmember_x) - 1]) {
+            joint_x = crossmember_joint_rail_x(member_index);
+            if (joint_x >= segment_start_x && joint_x <= segment_end_x)
+                translate([joint_x, side * rail_center_y, frame_center_z])
                     cylinder(h = rail_size[2] + 2 * boolean_overlap,
                         d = crossmember_bolt_diameter, center = true);
+        }
     }
 }
 
@@ -72,18 +74,35 @@ module splice_plate() {
     }
 }
 
+function crossmember_joint_rail_x(index) = index == 1
+    ? crossmember_x[index] - crossmember_joint_rail_x_offset
+    : frame_rear_x - crossmember_joint_rail_x_offset;
+function crossmember_joint_cross_y(index) = index == 1
+    ? rail_center_y - crossmember_joint_cross_inset_y
+    : rail_center_y;
+
 module crossmember(index = 0) {
     assert(index >= 0 && index < len(crossmember_x));
+    member_width = index == 1 ? crossmember_inner_width : frame_outer_width;
     difference() {
         translate([crossmember_x[index], 0,
                 frame_bottom_z + crossmember_size[2] / 2])
-            cube(crossmember_size, center = true);
-        for (side = [-1, 1])
-            translate([crossmember_x[index],
-                    side * crossmember_bolt_offset_y,
-                    frame_bottom_z + crossmember_size[2] / 2])
-                cylinder(h = crossmember_size[2] + 2 * boolean_overlap,
-                    d = crossmember_bolt_diameter, center = true);
+            cube([crossmember_size[0], member_width,
+                crossmember_size[2]], center = true);
+        if (index == 0)
+            for (side = [-1, 1])
+                translate([crossmember_x[index],
+                        side * crossmember_bolt_offset_y,
+                        frame_bottom_z + crossmember_size[2] / 2])
+                    cylinder(h = crossmember_size[2] + 2 * boolean_overlap,
+                        d = crossmember_bolt_diameter, center = true);
+        else
+            for (side = [-1, 1])
+                translate([crossmember_x[index],
+                        side * crossmember_joint_cross_y(index),
+                        frame_bottom_z + crossmember_size[2] / 2])
+                    cylinder(h = crossmember_size[2] + 2 * boolean_overlap,
+                        d = crossmember_bolt_diameter, center = true);
 
         for (side = [-1, 1])
             translate([crossmember_x[index], side * 12,
@@ -133,6 +152,40 @@ module crossmember_export(index = 0) {
     translate([-crossmember_x[index], 0,
             -(frame_bottom_z + crossmember_size[2] / 2)])
         crossmember(index);
+}
+
+module crossmember_joint_plate(index = 1, side = 1, face = 1) {
+    assert(index == 1 || index == 2);
+    rail_point = [crossmember_joint_rail_x(index), side * rail_center_y];
+    cross_point = [crossmember_x[index],
+        side * crossmember_joint_cross_y(index)];
+    plate_z = face > 0
+        ? frame_bottom_z + rail_size[2]
+            + crossmember_joint_plate_thickness / 2
+        : frame_bottom_z - crossmember_joint_plate_thickness / 2;
+    difference() {
+        hull()
+            for (point = [rail_point, cross_point])
+                translate([point[0], point[1], plate_z])
+                    cylinder(h = crossmember_joint_plate_thickness,
+                        d = crossmember_joint_plate_boss_diameter,
+                        center = true);
+        for (point = [rail_point, cross_point])
+            translate([point[0], point[1], plate_z])
+                cylinder(h = crossmember_joint_plate_thickness
+                        + 2 * boolean_overlap,
+                    d = crossmember_bolt_diameter, center = true);
+    }
+}
+
+module crossmember_joint_plate_export(index = 1) {
+    rail_point = [crossmember_joint_rail_x(index), rail_center_y];
+    cross_point = [crossmember_x[index], crossmember_joint_cross_y(index)];
+    center = [(rail_point[0] + cross_point[0]) / 2,
+        (rail_point[1] + cross_point[1]) / 2];
+    translate([-center[0], -center[1],
+            -(frame_bottom_z + rail_size[2])])
+        crossmember_joint_plate(index, 1, 1);
 }
 
 module beam_between_xy(a, b, width, height, z) {
@@ -200,6 +253,39 @@ module v_joint_holes() {
                     d = v_joint_hole_diameter, center = true);
 }
 
+module v_joint_half_relief(remove_top = false) {
+    relief_height = drawbar_beam_height / 2
+        + v_joint_lap_clearance / 2 + 2 * boolean_overlap;
+    relief_z = remove_top
+        ? frame_bottom_z + drawbar_beam_height
+            - relief_height / 2 + boolean_overlap
+        : frame_bottom_z + relief_height / 2 - boolean_overlap;
+    for (side = [-1, 1])
+        beam_between_xy(
+            [v_split_x - v_joint_overlap - boolean_overlap,
+                side * v_half_width_at(v_split_x - v_joint_overlap
+                    - boolean_overlap)],
+            [v_split_x + v_joint_overlap + boolean_overlap,
+                side * v_half_width_at(v_split_x + v_joint_overlap
+                    + boolean_overlap)],
+            drawbar_beam_width + 2 * boolean_overlap,
+            relief_height, relief_z);
+}
+
+module coupler_tongue_relief() {
+    tongue_start_x = coupler_adapter_center_x
+        + coupler_adapter_size[0] / 2 - boolean_overlap;
+    tongue_end_x = tongue_start_x + coupler_tongue_length
+        + 2 * boolean_overlap;
+    relief_height = drawbar_beam_height / 2
+        + coupler_lap_clearance / 2 + 2 * boolean_overlap;
+    translate([(tongue_start_x + tongue_end_x) / 2, 0,
+            frame_bottom_z + relief_height / 2 - boolean_overlap])
+        cube([tongue_end_x - tongue_start_x,
+            drawbar_beam_width + 2 * fit_clearance,
+            relief_height], center = true);
+}
+
 module drawbar_front() {
     difference() {
         union() {
@@ -214,6 +300,8 @@ module drawbar_front() {
             v_bridge(winch_bridge_x);
         }
         v_joint_holes();
+        v_joint_half_relief(false);
+        coupler_tongue_relief();
     }
 }
 
@@ -237,6 +325,7 @@ module drawbar_rear() {
                     drawbar_beam_height + 2 * boolean_overlap], center = true);
         }
         v_joint_holes();
+        v_joint_half_relief(true);
         for (side = [-1, 1])
             translate([v_rail_joint_front_x,
                     side * v_half_width_at(v_rail_joint_front_x),
@@ -292,15 +381,17 @@ module assembled_frame() {
         crossmember(index);
     for (seam_x = [2 * frame_segment_length])
         for (side = [-1, 1])
-            for (face = [-1, 1])
-                translate([seam_x,
-                        side * rail_center_y
-                            + face * splice_plate_offset_y,
-                        frame_center_z])
-                    splice_plate();
+            translate([seam_x,
+                    side * rail_center_y
+                        + side * splice_plate_offset_y,
+                    frame_center_z])
+                splice_plate();
     drawbar();
     for (side = [-1, 1])
-        for (face = [-1, 1])
+        for (face = [-1, 1]) {
             v_rail_joint_plate(side, face);
+            for (index = [1 : len(crossmember_x) - 1])
+                crossmember_joint_plate(index, side, face);
+        }
 }
 
