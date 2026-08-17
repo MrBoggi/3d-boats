@@ -26,7 +26,7 @@ parts=(
     helm_bench_cushion helm_bench_frame_port helm_bench_frame_starboard
     helm_bench_cross_braces helm_bench_side_rails
     aft_bench_servo_cover aft_bench_cushion aft_bench_backrest aft_bench_seat_support
-    bow_locker_base bow_cushion bow_rail_port bow_rail_starboard bow_anchor_roller
+    bow_locker_base bow_cushion bow_rail_port bow_rail_starboard bow_anchor_roller bow_eye bow_eye_backing
     outboard_xl_adapter
     ladder
 )

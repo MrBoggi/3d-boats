@@ -1,4 +1,5 @@
 include <hull_geometry.scad>
+use <bow_eye.scad>
 
 joint_profile_slice = 0.8;
 
@@ -138,10 +139,13 @@ module stage5_socket_cutters(seam_x) {
 }
 
 module stage5_bow_section() {
-    union() {
-        stage4_bow_section();
-        stage5_joint_bulkhead(section_bow_end, -1);
-        stage5_alignment_keys(section_bow_end);
+    difference() {
+        union() {
+            stage4_bow_section();
+            stage5_joint_bulkhead(section_bow_end, -1);
+            stage5_alignment_keys(section_bow_end);
+        }
+        bow_eye_hull_cutters();
     }
 }
 
