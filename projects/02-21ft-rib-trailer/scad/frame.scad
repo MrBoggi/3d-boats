@@ -302,6 +302,16 @@ module drawbar_front() {
         v_joint_holes();
         v_joint_half_relief(false);
         coupler_tongue_relief();
+        // Cut after the complete V/front union so the converging V arms
+        // cannot fill the adapter bolt holes again.
+        for (hole_x = [coupler_adapter_center_x
+                    + coupler_frame_hole_first_x,
+                coupler_adapter_center_x + coupler_frame_hole_first_x
+                    + coupler_frame_hole_spacing])
+            translate([hole_x, 0,
+                    frame_bottom_z + drawbar_beam_height / 2])
+                cylinder(h = drawbar_beam_height + 2 * boolean_overlap,
+                    d = coupler_frame_hole_diameter, center = true);
     }
 }
 

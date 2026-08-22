@@ -9,6 +9,7 @@ use <rear_accessories.scad>
 use <fenders.scad>
 use <coupler.scad>
 use <environment.scad>
+use <fit_tests.scad>
 
 module assembled_trailer() {
     if (show_road)
@@ -238,6 +239,17 @@ else if (selected_part == "side_wobble_pivot_collision")
     }
 else if (selected_part == "hardware_debug")
     trailer_hardware_envelopes();
+else if (selected_part == "fit_v_front"
+        || selected_part == "fit_v_rear"
+        || selected_part == "fit_coupler_frame"
+        || selected_part == "fit_splice_front"
+        || selected_part == "fit_splice_rear"
+        || selected_part == "fit_mid_rail"
+        || selected_part == "fit_mid_crossmember"
+        || selected_part == "fit_rear_rail"
+        || selected_part == "fit_rear_crossmember"
+        || selected_part == "fit_side_post_head")
+    fit_test_export(selected_part);
 else
     assert(false, str("Unknown selected_part: ", selected_part));
 
