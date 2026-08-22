@@ -349,6 +349,12 @@ innhold på hver plate. Prosjektene genereres reproducerbart med
 `scripts/build_plate_3mf.py`; generatoren kontrollerer arkivintegritet, antall
 instanser og alle interne objektreferanser.
 
+## Obligatorisk skjøtetest før restutskrift
+
+Ikke print `3mf/remaining_after_trial/` før `3mf/fit_tests/fit_test_plate_01.3mf` er printet og alle seks grensesnitt er fysisk godkjent. Testplaten inneholder 18 objekter på én A1-fane og bruker fullskala utsnitt fra den samme produksjonsgeometrien. Monteringsrekkefølge og godkjenningskriterier står i `3mf/fit_tests/README.md`. Testpakken genereres med `python3 scripts/build_fit_test_plate.py`.
+
+Under utviklingen av testkupongen ble det oppdaget at V-armenes union fylte de to M3-hullene i koblingsområdet. Produksjonsfronten er korrigert slik at hullene nå skjæres gjennom den komplette unionen. Dette bekrefter hvorfor fysisk kupongtest er obligatorisk før flere store deler printes.
+
 ## Restutskrift etter fysisk prøveprint
 
 Et eget restsett ligger i `3mf/remaining_after_trial/`. Det bygger på at begge fysiske faner i de gamle PETG-prosjektene 01 og 02 er printet, mens bare fane 1 i gamle prosjekt 03 er printet. `winch_tower_body` er eksplisitt tatt med fordi delen manglet i den fysiske utskriften, selv om den gamle prosjektmetadataen plasserte den på fane 1.
