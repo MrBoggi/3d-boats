@@ -7,6 +7,27 @@ boolean_overlap = 0.2;
 fit_clearance = 0.3;
 printer_size = [256, 256, 256];
 
+// Full-scale PLA alignment-test structure. Production thickness is retained
+// around every joint and hole; this web only replaces solid spans.
+alignment_web_thickness = 2.4;
+alignment_joint_margin = 12;
+alignment_hole_boss_diameter = 12;
+
+// Integrated frame joints: RUTHEX RX-M3x5.7 inserts and measured M3 heads.
+frame_joint_lap_clearance = 0.3;
+frame_joint_axial_clearance = 0.3;
+frame_joint_lap_length = 20;
+frame_joint_tab_width = 12;
+frame_joint_insert_hole_diameter = 4.0;
+frame_joint_insert_depth = 6.0;
+frame_joint_insert_length = 5.7;
+frame_joint_insert_outer_diameter = 4.6;
+frame_joint_insert_min_wall = 1.6;
+frame_joint_head_pocket_diameter = 5.2;
+frame_joint_head_pocket_depth = 3.6;
+frame_joint_bolt_diameter = 3.4;
+frame_joint_splice_hole_spacing = 10;
+
 boat_length = 660;
 boat_beam = 252;
 boat_z_offset = 56;
@@ -262,8 +283,10 @@ drawbar_beam_width = 12;
 v_split_x = 60;
 v_rear_x = 270;
 v_front_roller_x = 110;
-v_frame_end_x = v_rear_x - crossmember_size[0] / 2;
-rail_front_x = v_rear_x + crossmember_size[0] / 2;
+v_frame_end_x = v_rear_x - crossmember_size[0] / 2
+    - frame_joint_axial_clearance / 2;
+rail_front_x = v_rear_x + crossmember_size[0] / 2
+    + frame_joint_axial_clearance / 2;
 v_rail_joint_plate_thickness = 3;
 v_rail_joint_plate_diameter = 14;
 v_rail_joint_front_x = v_rear_x - 22;
@@ -403,6 +426,19 @@ assert(v_joint_lap_clearance >= fit_clearance,
 assert(drawbar_beam_height / 2 - v_joint_lap_clearance / 2
         > v_joint_hole_diameter,
     "V half-lap leaves too little material around its bolts");
+assert(frame_joint_lap_clearance >= fit_clearance,
+    "Integrated frame joints need at least the global print clearance");
+assert(frame_joint_insert_depth >= frame_joint_insert_length,
+    "Heat-set insert pocket is shorter than the RX-M3x5.7 insert");
+assert(rail_size[2] / 2 - frame_joint_lap_clearance / 2
+        - frame_joint_insert_depth >= 2,
+    "Too little material remains above the underside insert pocket");
+assert((frame_joint_tab_width - frame_joint_insert_outer_diameter) / 2
+        >= frame_joint_insert_min_wall,
+    "Integrated joint tab has insufficient wall around the M3 insert");
+assert(rail_size[2] / 2 - frame_joint_lap_clearance / 2
+        - frame_joint_head_pocket_depth >= 2,
+    "Too little material remains below the recessed M3 bolt head");
 assert(v_rail_joint_front_x < v_rear_x
         && v_rail_joint_rear_x > v_rear_x,
     "V-to-rail joint plate must bridge the front crossmember");

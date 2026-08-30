@@ -1,5 +1,8 @@
 # Restutskrift etter prøveprint
 
+> **FORELDET 2026-08-30:** Ikke print dette restsettet. Rammeskjøtene er
+> redesignet og settet regenereres først etter fysisk kuponggodkjenning.
+
 Forutsetning: Begge faner i gamle PETG-prosjekt 01 og 02 er printet. Av gamle PETG-prosjekt 03 er bare fysisk fane 1 printet, men `winch_tower_body` mangler fysisk. TPU-baugstoppen regnes som ikke printet.
 
 Settet inneholder uprintede deler og alle tidligere printede deler som ble foreldet av skjøte-/sidestøtteredesignet. Det er ikke en komplett henger nummer to.

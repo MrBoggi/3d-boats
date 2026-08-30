@@ -23,13 +23,14 @@ module fit_rail_splice_coupon(rear_half = false) {
     seam_x = 2 * frame_segment_length;
     intersection() {
         rail_segment(rear_half ? 2 : 1, 1);
-        translate([seam_x + (rear_half ? 1 : -1) * 14, rail_center_y, frame_center_z])
-            cube([28, rail_size[1] + 2, rail_size[2] + 2], center = true);
+        translate([seam_x, rail_center_y, frame_center_z])
+            cube([frame_joint_lap_length + 4, rail_size[1] + 2,
+                rail_size[2] + 2], center = true);
     }
 }
 module fit_crossmember_rail_coupon(index = 1) {
     intersection() {
-        rail_segment(index == 1 ? 1 : 2, 1);
+        rail_segment(index <= 1 ? 1 : 2, 1);
         translate([crossmember_joint_rail_x(index), rail_center_y, frame_center_z])
             cube([30, rail_size[1] + 2, rail_size[2] + 2], center = true);
     }
@@ -39,7 +40,15 @@ module fit_crossmember_end_coupon(index = 1) {
         crossmember(index);
         translate([crossmember_x[index], crossmember_joint_cross_y(index),
                 frame_bottom_z + crossmember_size[2] / 2])
-            cube([crossmember_size[0] + 2, 34, crossmember_size[2] + 2], center = true);
+            cube([64, 34, crossmember_size[2] + 2], center = true);
+    }
+}
+module fit_front_v_coupon() {
+    intersection() {
+        drawbar_rear();
+        translate([v_rail_joint_front_x,
+                v_half_width_at(v_rail_joint_front_x), frame_center_z])
+            cube([30, 24, rail_size[2] + 2], center = true);
     }
 }
 module fit_side_support_post_head() {
@@ -57,9 +66,19 @@ module fit_test_export(part) {
     else if (part == "fit_coupler_frame")
         translate([-coupler_adapter_center_x - coupler_adapter_size[0] / 2 - coupler_tongue_length / 2, 0, -frame_bottom_z]) fit_coupler_frame_coupon();
     else if (part == "fit_splice_front")
-        translate([-2 * frame_segment_length + 14, -rail_center_y, -frame_bottom_z]) fit_rail_splice_coupon(false);
+        translate([-2 * frame_segment_length, -rail_center_y, -frame_bottom_z]) fit_rail_splice_coupon(false);
     else if (part == "fit_splice_rear")
-        translate([-2 * frame_segment_length - 14, -rail_center_y, -frame_bottom_z]) fit_rail_splice_coupon(true);
+        translate([-2 * frame_segment_length, -rail_center_y, -frame_bottom_z]) fit_rail_splice_coupon(true);
+    else if (part == "fit_front_v")
+        translate([-v_rail_joint_front_x,
+                -v_half_width_at(v_rail_joint_front_x), -frame_bottom_z])
+            fit_front_v_coupon();
+    else if (part == "fit_front_rail")
+        translate([-v_rail_joint_rear_x, -rail_center_y, -frame_bottom_z])
+            fit_crossmember_rail_coupon(0);
+    else if (part == "fit_front_crossmember")
+        translate([-crossmember_x[0], -crossmember_joint_cross_y(0),
+                -frame_bottom_z]) fit_crossmember_end_coupon(0);
     else if (part == "fit_mid_rail")
         translate([-crossmember_joint_rail_x(1), -rail_center_y, -frame_bottom_z]) fit_crossmember_rail_coupon(1);
     else if (part == "fit_mid_crossmember")

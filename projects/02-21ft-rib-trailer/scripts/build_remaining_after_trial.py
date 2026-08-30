@@ -14,8 +14,6 @@ builder.PETG_QUANTITIES = {
     "coupler_mount_adapter": 1,
     "crossmember_mid": 1,
     "rear_accessory_crossmember": 1,
-    "crossmember_joint_plate_mid": 4,
-    "crossmember_joint_plate_rear": 4,
     "side_double_roller_cradle": 4,
     "side_roller_wobble_holder": 8,
 
@@ -28,7 +26,6 @@ builder.PETG_QUANTITIES = {
     "side_support_post_front": 2,
     "side_support_post_rear": 2,
     "side_support_roller": 8,
-    "v_rail_joint_plate": 4,
 
     # Explicitly reported missing from the physical print.
     "winch_tower_body": 1,

@@ -9,9 +9,8 @@ else
     echo "OpenSCAD not found" >&2; exit 1
 fi
 parts=(
- drawbar_front drawbar_rear frame_rail_middle frame_rail_rear splice_plate
- v_rail_joint_plate crossmember crossmember_mid rear_accessory_crossmember
- crossmember_joint_plate_mid crossmember_joint_plate_rear coupler_mount_adapter
+ drawbar_front drawbar_rear frame_rail_middle frame_rail_rear
+ crossmember crossmember_mid rear_accessory_crossmember coupler_mount_adapter
  bogie_arm bogie_mount wheel_hex_adapter tandem_fender fender_mount_bracket
  keel_roller keel_roller_bracket_front keel_roller_bracket_mid_front
  keel_roller_bracket_mid_rear keel_roller_bracket_rear side_support_receiver
@@ -23,7 +22,9 @@ parts=(
 empty_checks=(drawbar_joint_collision coupler_drawbar_collision
  crossmember_frame_collision side_support_pivot_collision
  side_wobble_pivot_collision bogie_fender_collision bow_stop_fork_collision
- winch_strap_stop_collision)
+ winch_strap_stop_collision integrated_front_joint_collision
+ integrated_mid_joint_collision integrated_rear_joint_collision
+ integrated_rail_splice_collision)
 tmp=".joint-check.$$"
 mkdir -p "$tmp"
 trap 'rm -rf -- "$tmp"' EXIT

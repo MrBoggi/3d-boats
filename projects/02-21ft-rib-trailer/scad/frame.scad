@@ -1,5 +1,58 @@
 include <config.scad>
 
+frame_joint_lower_height = rail_size[2] / 2
+    - frame_joint_lap_clearance / 2;
+frame_joint_upper_bottom_z = frame_bottom_z + rail_size[2] / 2
+    + frame_joint_lap_clearance / 2;
+
+module frame_joint_upper_fastener_hole(x, y) {
+    translate([x, y, frame_center_z])
+        cylinder(h = rail_size[2] + 2 * boolean_overlap,
+            d = frame_joint_bolt_diameter, center = true);
+    translate([x, y,
+            frame_bottom_z + rail_size[2]
+                - frame_joint_head_pocket_depth / 2 + boolean_overlap])
+        cylinder(h = frame_joint_head_pocket_depth + 2 * boolean_overlap,
+            d = frame_joint_head_pocket_diameter, center = true);
+}
+
+module frame_joint_lower_fastener_hole(x, y) {
+    translate([x, y, frame_center_z])
+        cylinder(h = rail_size[2] + 2 * boolean_overlap,
+            d = frame_joint_bolt_diameter, center = true);
+    translate([x, y,
+            frame_bottom_z + frame_joint_insert_depth / 2
+                - boolean_overlap])
+        cylinder(h = frame_joint_insert_depth + 2 * boolean_overlap,
+            d = frame_joint_insert_hole_diameter, center = true);
+    translate([x, y, frame_bottom_z + 0.5])
+        cylinder(h = 1 + 2 * boolean_overlap,
+            d1 = frame_joint_insert_hole_diameter + 0.8,
+            d2 = frame_joint_insert_hole_diameter, center = true);
+}
+
+module frame_joint_tab(points, height = frame_joint_lower_height,
+        z = frame_bottom_z) {
+    hull()
+        for (point = points)
+            translate([point[0], point[1], z])
+                cylinder(h = height, d = frame_joint_tab_width);
+}
+
+module frame_joint_upper_relief(points) {
+    frame_joint_tab(points,
+        rail_size[2] / 2 + frame_joint_lap_clearance / 2
+            + 2 * boolean_overlap,
+        frame_bottom_z - boolean_overlap);
+}
+
+module frame_joint_lower_relief(points) {
+    frame_joint_tab(points,
+        rail_size[2] / 2 + frame_joint_lap_clearance / 2
+            + 2 * boolean_overlap,
+        frame_joint_upper_bottom_z - boolean_overlap);
+}
+
 module rail_splice_hole(x, side) {
     translate([x, side * rail_center_y, frame_center_z])
         rotate([90, 0, 0])
@@ -8,10 +61,13 @@ module rail_splice_hole(x, side) {
 }
 
 function rail_segment_start(index) =
-    index == 1 ? rail_front_x : frame_front_x + index * frame_segment_length;
+    index == 1 ? rail_front_x
+        : frame_front_x + index * frame_segment_length
+            - frame_joint_lap_length / 2;
 function rail_segment_end(index) =
     index == 2 ? frame_rear_x
-        : frame_front_x + (index + 1) * frame_segment_length;
+        : frame_front_x + (index + 1) * frame_segment_length
+            + frame_joint_lap_length / 2;
 
 module rail_segment(index = 0, side = 1) {
     assert(index >= 1 && index <= 2);
@@ -24,13 +80,59 @@ module rail_segment(index = 0, side = 1) {
         translate([segment_center_x, side * rail_center_y, frame_center_z])
             cube([segment_length, rail_size[1], rail_size[2]], center = true);
 
-        if (index == 1)
-            translate([v_rail_joint_rear_x, side * rail_center_y,
-                    frame_center_z])
-                cylinder(h = rail_size[2] + 2 * boolean_overlap,
-                    d = crossmember_bolt_diameter, center = true);
+        if (index == 1) {
+            // Front crossmember and mid crossmember: rail is the upper half.
+            frame_joint_upper_relief([
+                [v_rail_joint_front_x,
+                    side * v_half_width_at(v_rail_joint_front_x)],
+                [crossmember_x[0], side * rail_center_y],
+                [v_rail_joint_rear_x, side * rail_center_y]
+            ]);
+            frame_joint_upper_fastener_hole(v_rail_joint_rear_x,
+                side * rail_center_y);
+            frame_joint_upper_fastener_hole(crossmember_joint_rail_x(1),
+                side * rail_center_y);
+
+            // One continuous lower relief covers the nearby mid-crossmember
+            // tab and longitudinal splice without coincident cutter edges.
+            frame_joint_upper_relief([
+                [crossmember_joint_rail_x(1),
+                    side * crossmember_joint_cross_y(1)],
+                [crossmember_joint_rail_x(1), side * rail_center_y],
+                [2 * frame_segment_length - frame_joint_lap_length / 2,
+                    side * rail_center_y],
+                [2 * frame_segment_length + frame_joint_lap_length / 2,
+                    side * rail_center_y]
+            ]);
+            for (x = [2 * frame_segment_length
+                        - frame_joint_splice_hole_spacing / 2,
+                    2 * frame_segment_length
+                        + frame_joint_splice_hole_spacing / 2])
+                frame_joint_upper_fastener_hole(x, side * rail_center_y);
+        }
 
         if (index == 2) {
+            // Rear rail is the lower member at the longitudinal splice.
+            frame_joint_lower_relief([
+                [2 * frame_segment_length - frame_joint_lap_length / 2,
+                    side * rail_center_y],
+                [2 * frame_segment_length + frame_joint_lap_length / 2,
+                    side * rail_center_y]
+            ]);
+            for (x = [2 * frame_segment_length
+                        - frame_joint_splice_hole_spacing / 2,
+                    2 * frame_segment_length
+                        + frame_joint_splice_hole_spacing / 2])
+                frame_joint_lower_fastener_hole(x, side * rail_center_y);
+
+            // Rear crossmember: rail is the upper half.
+            frame_joint_upper_relief([
+                [crossmember_joint_rail_x(2), side * rail_center_y],
+                [frame_rear_x, side * rail_center_y]
+            ]);
+            frame_joint_upper_fastener_hole(crossmember_joint_rail_x(2),
+                side * rail_center_y);
+
             for (mount_x = [bogie_center_x - bogie_mount_hole_spacing / 2,
                     bogie_center_x + bogie_mount_hole_spacing / 2])
                 translate([mount_x, side * rail_center_y, frame_center_z])
@@ -38,20 +140,6 @@ module rail_segment(index = 0, side = 1) {
                         d = m3_clearance, center = true);
         }
 
-        if (index > 1)
-            rail_splice_hole(index * frame_segment_length
-                + splice_hole_spacing / 2, side);
-        if (index < 2)
-            rail_splice_hole((index + 1) * frame_segment_length
-                - splice_hole_spacing / 2, side);
-
-        for (member_index = [1 : len(crossmember_x) - 1]) {
-            joint_x = crossmember_joint_rail_x(member_index);
-            if (joint_x >= segment_start_x && joint_x <= segment_end_x)
-                translate([joint_x, side * rail_center_y, frame_center_z])
-                    cylinder(h = rail_size[2] + 2 * boolean_overlap,
-                        d = crossmember_bolt_diameter, center = true);
-        }
     }
 }
 
@@ -74,9 +162,10 @@ module splice_plate() {
     }
 }
 
-function crossmember_joint_rail_x(index) = index == 1
-    ? crossmember_x[index] - crossmember_joint_rail_x_offset
-    : frame_rear_x - crossmember_joint_rail_x_offset;
+function crossmember_joint_rail_x(index) = index == 0
+    ? v_rail_joint_rear_x
+    : index == 1 ? crossmember_x[index] - crossmember_joint_rail_x_offset
+        : frame_rear_x - crossmember_joint_rail_x_offset;
 function crossmember_joint_cross_y(index) = index == 1
     ? rail_center_y - crossmember_joint_cross_inset_y
     : rail_center_y;
@@ -85,24 +174,37 @@ module crossmember(index = 0) {
     assert(index >= 0 && index < len(crossmember_x));
     member_width = index == 1 ? crossmember_inner_width : frame_outer_width;
     difference() {
-        translate([crossmember_x[index], 0,
-                frame_bottom_z + crossmember_size[2] / 2])
-            cube([crossmember_size[0], member_width,
-                crossmember_size[2]], center = true);
-        if (index == 0)
-            for (side = [-1, 1])
-                translate([crossmember_x[index],
-                        side * crossmember_bolt_offset_y,
-                        frame_bottom_z + crossmember_size[2] / 2])
-                    cylinder(h = crossmember_size[2] + 2 * boolean_overlap,
-                        d = crossmember_bolt_diameter, center = true);
-        else
-            for (side = [-1, 1])
-                translate([crossmember_x[index],
-                        side * crossmember_joint_cross_y(index),
-                        frame_bottom_z + crossmember_size[2] / 2])
-                    cylinder(h = crossmember_size[2] + 2 * boolean_overlap,
-                        d = crossmember_bolt_diameter, center = true);
+        union() {
+            translate([crossmember_x[index], 0,
+                    frame_bottom_z + crossmember_size[2] / 2])
+                cube([crossmember_size[0], member_width,
+                    crossmember_size[2]], center = true);
+            for (side = [-1, 1]) {
+                points = index == 0 ? [
+                        [v_rail_joint_front_x,
+                            side * v_half_width_at(v_rail_joint_front_x)],
+                        [crossmember_x[0], side * rail_center_y],
+                        [v_rail_joint_rear_x, side * rail_center_y]
+                    ] : [
+                        [index == 1 ? crossmember_joint_rail_x(index)
+                                : crossmember_x[index],
+                            side * crossmember_joint_cross_y(index)],
+                        [crossmember_joint_rail_x(index),
+                            side * rail_center_y]
+                    ];
+                frame_joint_tab(points);
+            }
+        }
+        for (side = [-1, 1]) {
+            if (index == 0) {
+                frame_joint_lower_fastener_hole(v_rail_joint_front_x,
+                    side * v_half_width_at(v_rail_joint_front_x));
+                frame_joint_lower_fastener_hole(v_rail_joint_rear_x,
+                    side * rail_center_y);
+            } else
+                frame_joint_lower_fastener_hole(
+                    crossmember_joint_rail_x(index), side * rail_center_y);
+        }
 
         for (side = [-1, 1])
             translate([crossmember_x[index], side * 12,
@@ -253,6 +355,22 @@ module v_joint_holes() {
                     d = v_joint_hole_diameter, center = true);
 }
 
+module v_joint_upper_fasteners() {
+    for (side = [-1, 1])
+        for (hole_x = [v_split_x - v_joint_hole_spacing / 2,
+                v_split_x + v_joint_hole_spacing / 2])
+            frame_joint_upper_fastener_hole(hole_x,
+                side * v_half_width_at(hole_x));
+}
+
+module v_joint_lower_fasteners() {
+    for (side = [-1, 1])
+        for (hole_x = [v_split_x - v_joint_hole_spacing / 2,
+                v_split_x + v_joint_hole_spacing / 2])
+            frame_joint_lower_fastener_hole(hole_x,
+                side * v_half_width_at(hole_x));
+}
+
 module v_joint_half_relief(remove_top = false) {
     relief_height = drawbar_beam_height / 2
         + v_joint_lap_clearance / 2 + 2 * boolean_overlap;
@@ -299,7 +417,7 @@ module drawbar_front() {
             drawbar_center_beam();
             v_bridge(winch_bridge_x);
         }
-        v_joint_holes();
+        v_joint_upper_fasteners();
         v_joint_half_relief(false);
         coupler_tongue_relief();
         // Cut after the complete V/front union so the converging V arms
@@ -334,14 +452,18 @@ module drawbar_rear() {
                     frame_outer_width + 2 * drawbar_beam_width,
                     drawbar_beam_height + 2 * boolean_overlap], center = true);
         }
-        v_joint_holes();
+        v_joint_lower_fasteners();
         v_joint_half_relief(true);
         for (side = [-1, 1])
-            translate([v_rail_joint_front_x,
-                    side * v_half_width_at(v_rail_joint_front_x),
-                    frame_bottom_z + drawbar_beam_height / 2])
-                cylinder(h = drawbar_beam_height + 2 * boolean_overlap,
-                    d = crossmember_bolt_diameter, center = true);
+            frame_joint_upper_fastener_hole(v_rail_joint_front_x,
+                side * v_half_width_at(v_rail_joint_front_x));
+        for (side = [-1, 1])
+            frame_joint_upper_relief([
+                [v_rail_joint_front_x,
+                    side * v_half_width_at(v_rail_joint_front_x)],
+                [crossmember_x[0], side * rail_center_y],
+                [v_rail_joint_rear_x, side * rail_center_y]
+            ]);
     }
 }
 
@@ -389,19 +511,37 @@ module assembled_frame() {
             rail_segment(index, side);
     for (index = [0 : len(crossmember_x) - 1])
         crossmember(index);
-    for (seam_x = [2 * frame_segment_length])
-        for (side = [-1, 1])
-            translate([seam_x,
-                    side * rail_center_y
-                        + side * splice_plate_offset_y,
-                    frame_center_z])
-                splice_plate();
     drawbar();
-    for (side = [-1, 1])
-        for (face = [-1, 1]) {
-            v_rail_joint_plate(side, face);
-            for (index = [1 : len(crossmember_x) - 1])
-                crossmember_joint_plate(index, side, face);
+}
+
+module integrated_front_joint_collision() {
+    intersection() {
+        crossmember(0);
+        union() {
+            drawbar_rear();
+            for (side = [-1, 1]) rail_segment(1, side);
         }
+    }
+}
+
+module integrated_mid_joint_collision() {
+    intersection() {
+        crossmember(1);
+        for (side = [-1, 1]) rail_segment(1, side);
+    }
+}
+
+module integrated_rear_joint_collision() {
+    intersection() {
+        crossmember(2);
+        for (side = [-1, 1]) rail_segment(2, side);
+    }
+}
+
+module integrated_rail_splice_collision() {
+    intersection() {
+        for (side = [-1, 1]) rail_segment(1, side);
+        for (side = [-1, 1]) rail_segment(2, side);
+    }
 }
 

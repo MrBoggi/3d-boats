@@ -1,5 +1,9 @@
 # Skjøte- og koblingstest
 
+> **FORELDET 2026-08-30:** Rammedelen av denne pakken bruker tidligere løse
+> skjøteplater. Bruk `../integrated_joint_tests/integrated_frame_joint_test.3mf`
+> for den reviderte rammen.
+
 Print og godkjenn denne pakken før `remaining_after_trial` brukes. Kupongene er fullskala utsnitt av produksjonsgeometrien; hull, anleggsflater og klaringer er identiske. Bruk faktiske M3-skruer, skiver og muttere under kontrollen.
 
 Godkjenn: fri innføring uten tvang, ingen synlig vridning, gjennomgående hull som flukter, plater som ligger plant, og fri vipping i begge siderulleledd.
