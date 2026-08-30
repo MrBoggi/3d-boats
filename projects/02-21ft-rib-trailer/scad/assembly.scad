@@ -10,6 +10,7 @@ use <fenders.scad>
 use <coupler.scad>
 use <environment.scad>
 use <fit_tests.scad>
+use <alignment_tests.scad>
 
 module assembled_trailer() {
     if (show_road)
@@ -206,6 +207,14 @@ else if (selected_part == "drawbar_joint_collision")
         drawbar_front();
         drawbar_rear();
     }
+else if (selected_part == "integrated_front_joint_collision")
+    integrated_front_joint_collision();
+else if (selected_part == "integrated_mid_joint_collision")
+    integrated_mid_joint_collision();
+else if (selected_part == "integrated_rear_joint_collision")
+    integrated_rear_joint_collision();
+else if (selected_part == "integrated_rail_splice_collision")
+    integrated_rail_splice_collision();
 else if (selected_part == "coupler_drawbar_collision")
     intersection() {
         drawbar_front();
@@ -244,12 +253,25 @@ else if (selected_part == "fit_v_front"
         || selected_part == "fit_coupler_frame"
         || selected_part == "fit_splice_front"
         || selected_part == "fit_splice_rear"
+        || selected_part == "fit_front_v"
+        || selected_part == "fit_front_rail"
+        || selected_part == "fit_front_crossmember"
         || selected_part == "fit_mid_rail"
         || selected_part == "fit_mid_crossmember"
         || selected_part == "fit_rear_rail"
         || selected_part == "fit_rear_crossmember"
         || selected_part == "fit_side_post_head")
     fit_test_export(selected_part);
+else if (selected_part == "alignment_drawbar_front"
+        || selected_part == "alignment_drawbar_rear"
+        || selected_part == "alignment_frame_rail_middle"
+        || selected_part == "alignment_frame_rail_rear"
+        || selected_part == "alignment_crossmember"
+        || selected_part == "alignment_crossmember_mid"
+        || selected_part == "alignment_rear_accessory_crossmember")
+    alignment_test_export(selected_part);
+else if (selected_part == "alignment_assembly_guide")
+    alignment_assembly_guide();
 else
     assert(false, str("Unknown selected_part: ", selected_part));
 

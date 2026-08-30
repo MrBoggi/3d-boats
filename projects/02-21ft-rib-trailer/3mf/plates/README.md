@@ -1,5 +1,8 @@
 # Ferdig arrangerte printplater
 
+> **FORELDET 2026-08-30:** Ikke print disse produksjonsplatene. Rammeskjøtene
+> er redesignet og platene regenereres først etter fysisk kuponggodkjenning.
+
 A1, 256 × 256 mm. Antallene dekker én komplett henger.
 Prosjektfilene inneholder totalt 8 fysiske platefaner.
 

@@ -8,7 +8,7 @@ med roterende hjul, vippbar boggi og justerbare skrogstøtter.
 ## Status
 
 Detaljert digital review-versjon er implementert. Den inneholder komplett
-sammenstilling, direkte skrogreferanse fra prosjekt 01 og 35 separate
+sammenstilling, direkte skrogreferanse fra prosjekt 01 og 31 gjeldende separate
 eksportmål. En forstørret todelt V-front, rammeskjøter, tverrbjelkefester,
 boggi-endestopp, M4-hjulaksler, synlige M4-muttere og separate 12 mm sekskantadaptere med avstandshylse,
 justerbare støtter og en fremoverlent, avstivet vinsjstolpe med V-stopp på båtsiden er modellert. Modellen er kontrollert
@@ -234,7 +234,7 @@ Etter visuell godkjenning eksporteres hele settet og tre PNG-visninger med:
 - To utvendige skjøtelasker, én på yttersiden av hver vange ved X = 440 mm. Innvendige lasker er fjernet fordi de kolliderte med midtbjelkens festeområde.
 - Én fullbredde frontbjelke ved X = 270 mm, én egen forkortet midtbjelke ved X = 430 mm og én tilpasset lysbjelke ved X = 591,3 mm. Den tidligere tverrbjelken i vangskjøten ved X = 440 mm er fjernet, slik at skjøteboltene ikke ligger i en delesøm.
 - Midtbjelken har 0,3 mm sideklaring til vangene; lysbjelken har 0,3 mm endeklaring bak vangene. Hver skjøt bruker egne 3 mm over-/underplater på begge sider, totalt fire plater per bjelke.
-- V-bakdelen stopper plant ved forkanten av tverrbjelken ved X = 270 mm, og hovedvangene starter ved bakkanten. Fire identiske 3 mm skjøteplater, én over og én under på hver side, forbinder V-arm, tverrbjelke og hovedvange med tre M3-bolter per side.
+- V-bakdelen og hovedvangene møter fremre tverrbjelke med 0,3 mm aksial klaring. Integrerte undertunger på tverrbjelken låses til komplementære overlepper i V-arm og vange med én M3-smeltemutterforbindelse i hver leppe.
 - Todelt, forstørret V-front med en reell halv-i-halv-skjøt, 0,3 mm vertikal printklaring og to M3-bolter per arm, integrerte broer og langsgående senterbjelke frem til vinsjtverrbjelken.
 - Separat frontadapter med 18 mm halv-i-halv-tunge, 0,3 mm vertikal klaring, to M3-rammebolter og aksial M3-stud for kjøpt 6 mm trailerklør.
 - To boggiarmer og to åpne clevisfester med 4 mm inner-/ytterører, 1,2 mm lagergap, 0,8 mm skiver og fanget M3-mutter. Hvert feste har toppflens og to vertikale M3-bolter gjennom hovedvangen; endestoppene gir verifisert ±12° utslag.
@@ -257,7 +257,7 @@ Etter første fysiske prøveutskrift ble den tidligere geometriske overlappingen
 
 Midtbjelken ender 0,3 mm innenfor hovedvangene og lysbjelken starter 0,3 mm bak vangeendene. Begge forbindes med separate 3 mm plater over og under, to per side. Dermed finnes det ikke lenger massive bjelkevolumer som opptar samme plass. Sidestøtten har et rundt hovedpivotnav i en gaffel, og hver av de to siderullene har sin egen sekundærpivot med fri knastklaring.
 
-Kjør `scripts/check_joint_interfaces.sh` etter geometriendringer. Kontrollen rendrer alle 35 printfiler og krever `Simple: yes`, og den krever tomt kollisjonsvolum i åtte kritiske grensesnitt. Dette er digital passkontroll; den nye V-skjøten og de nye tverrbjelkeplatene må fortsatt bekreftes med små fysiske prøveutskrifter før hele rammen printes.
+Kjør `scripts/check_joint_interfaces.sh` etter geometriendringer. Kontrollen rendrer alle 31 gjeldende printfiler og krever `Simple: yes`, og den krever tomt kollisjonsvolum i tolv kritiske grensesnitt. Dette er digital passkontroll; de integrerte halv-i-halv-skjøtene og smeltemutterlommene må fortsatt bekreftes med den lille fysiske PLA-pakken før hele rammen printes.
 
 ## Printorientering
 
@@ -282,7 +282,7 @@ Kjør `scripts/check_joint_interfaces.sh` etter geometriendringer. Kontrollen re
 | Siderulle | Én rund side ned |
 | Vinsjtårn | Fot/anleggsflate ned; lokal støtte kan bli nødvendig |
 
-Alle 35 eksportdeler er eksportert til STL og kontrollmålt fra den faktiske
+De tidligere 35 platebaserte eksportdelene ble eksportert til STL og kontrollmålt fra den faktiske
 triangelgeometrien. Samtlige kompilerer som `Simple: yes` og ligger innenfor
 256 × 256 × 256 mm. Største todimensjonale fotavtrykk er `drawbar_rear`
 på ca. 214 × 217 mm; tverrbjelkene er 220 mm lange. Alle delene er også
@@ -290,7 +290,7 @@ slicet digitalt på korrekt A1-plate som beskrevet under.
 
 ## Slicer-verifikasjon
 
-Alle 35 STL-er er slicet med Bambu Studio 2.7.1.62 Flatpak mot Bambu Lab A1,
+De tidligere 35 platebaserte STL-ene ble slicet med Bambu Studio 2.7.1.62 Flatpak mot Bambu Lab A1,
 0,4 mm dyse og 0,20 mm Standard. De strukturelle delene ble kontrollert med
 Generic PETG; `bow_stop` ble i tillegg kontrollert med Bambu TPU 95A. Alle
 deler ble beholdt i dokumentert eksportorientering, med kun platearrangering
@@ -338,7 +338,7 @@ Prototypeprofilene er:
   `side_double_roller_cradle`, `side_roller_wobble_holder`, `tandem_fender`,
   `wheel_hex_adapter`, `winch_tower_body` og TPU-delen `bow_stop`.
 
-Alle 35 pakkede filer er kontrollslicet på A1-plate 256 × 256 mm uten
+De tidligere 35 pakkede filene ble kontrollslicet på A1-plate 256 × 256 mm uten
 gjenværende advarsler. Innstillingene er et sterkt utgangspunkt for
 prøveutskrift, men er ikke fysisk lasttestet. Kontroller valgt filament og
 byggeplate i Bambu Studio før utskrift.
@@ -354,6 +354,51 @@ instanser og alle interne objektreferanser.
 Ikke print `3mf/remaining_after_trial/` før `3mf/fit_tests/fit_test_plate_01.3mf` er printet og alle seks grensesnitt er fysisk godkjent. Testplaten inneholder 18 objekter på én A1-fane og bruker fullskala utsnitt fra den samme produksjonsgeometrien. Monteringsrekkefølge og godkjenningskriterier står i `3mf/fit_tests/README.md`. Testpakken genereres med `python3 scripts/build_fit_test_plate.py`.
 
 Under utviklingen av testkupongen ble det oppdaget at V-armenes union fylte de to M3-hullene i koblingsområdet. Produksjonsfronten er korrigert slik at hullene nå skjæres gjennom den komplette unionen. Dette bekrefter hvorfor fysisk kupongtest er obligatorisk før flere store deler printes.
+
+## Fullskala ramme-/alignment-test i PLA
+
+> **Foreldet etter skjøteredign 2026-08-30:** Den eksisterende fullskala
+> alignment-filen dokumenterer den platebaserte rammen og skal ikke printes på
+> nytt. Ny fullskalatest genereres etter at de integrerte skjøtekupongene er
+> fysisk godkjent.
+
+`3mf/alignment_tests/frame_alignment_test.3mf` inneholder en
+materialbesparende fullskalatest av hele V-fronten, begge hovedvangene og alle
+tre tverrbjelkene. Testdelene er interseksjoner med den faktiske
+produksjonsgeometrien: ytre kontur og alle hull er uendret, 18 mm
+produksjonstykkelse beholdes rundt skjøter og festehull, og massive spenn
+erstattes av en 2,4 mm sammenhengende web. De ordinære produksjonsplatene
+brukes i alle rammeskjøter.
+
+3MF-prosjektet har to A1-platefaner og 23 objekter. Print begge fanene i
+PolySmart PLA Phantom Black og monter med faktiske M3-skruer, skiver og
+muttere. Godkjenn total lengde, V-vinkel, symmetri, plane anleggsflater,
+hullplassering, sidevalg og monteringsrekkefølge. Profilen bruker 215 °C dyse,
+55 °C plate, 0,20 mm lag, fire vegger, fem topp-/bunnlag og 15 % gyroid.
+Dette er en geometri- og monteringstest, ikke en styrketest. Platepakken kan
+regenereres med `scripts/build_frame_alignment_test.py` i et miljø med Python.
+
+Denne konstruksjonsmetoden er standard for senere fullskala geometri- og
+alignment-tester i prosjektet: testdelene skal avledes direkte fra
+produksjonsgeometrien, beholde full tykkelse rundt skjøter, hull og
+anleggsflater, og bruke tynne sammenhengende webber mellom kontrollpunktene.
+Styrke-, last-, varme- og endelige materialklareringstester skal fortsatt bruke
+representativ produksjonsgeometri og riktig produksjonsmateriale.
+
+## Integrerte rammeskjøter — obligatorisk ny test
+
+Rammen bruker nå integrerte halv-i-halv-skjøter i stedet for separate side-,
+over- og underplater. Underdelen har blindlomme fra undersiden for RUTHEX
+RX-M3×5.7 (Ø4,0 × 6,0 mm), mens overdelen har Ø3,4 mm gjennomgang og
+Ø5,2 × 3,6 mm forsenkning for det målte M3-sylinderhodet. Vertikal
+printklaring er 0,3 mm. Smeltemutteren monteres fra undersiden, slik at
+boltlasten trekker innsatsen inn mot materialet.
+
+Print og godkjenn
+`3mf/integrated_joint_tests/integrated_frame_joint_test.3mf` før ny fullskala
+alignment-test eller PETG-produksjon. Pakken har én A1-fane og 11 PLA-kuponger
+direkte klippet fra produksjonsgeometrien. Monteringsrekkefølge og kriterier
+står i `3mf/integrated_joint_tests/README.md`.
 
 ## Restutskrift etter fysisk prøveprint
 
@@ -385,7 +430,7 @@ skjermbrakett. Skjermbraketten sitter nå separat på clevisens toppbro.
 ## Monteringsrekkefølge for prototype
 
 1. Print og prøv V–vange-skjøteplaten, skjøtelasken, én sekskantadapter og én boggiarm.
-2. Monter V-bakdelen mot forkanten av fremre tverrbjelke, hovedvangene mot bakkanten, og lås knutepunktet med skjøteplater over og under før resten av rammeskjøtene trekkes til.
+2. Sett smeltemutterne fra undersiden i fremre tverrbjelkes integrerte undertunger. Legg V-bakdelen og hovedvangene ned på de komplementære leppene og før M3-boltene inn ovenfra.
 3. Monter boggifester, boggiarmer og fire hjul; kontroller fritt utslag.
 4. Monter kjølruller og sidestøtter uten å stramme endelig.
 5. Sett båten på hengeren, juster støttehøydene og sjekk minst 5 mm hardklaring.
@@ -409,7 +454,8 @@ gjenger modelleres direkte; bruk klaringshull, mutterlommer eller varmeinnsatser
 | Printet hjuladapter | required | 11,5 mm AF hex × 5,5 mm; Ø18 × 2 mm flens; Ø10 × 6,5 mm hylse |
 | [AliExpress 1005009693636383](https://www.aliexpress.com/item/1005009693636383.html) | example | Ø65 × reservert 27 mm; 12 mm hex |
 | M3 × 18 mm boggipivot | required | Ø3,4 mm klaringshull; 2 × Ø7/0,8 mm skiver; fanget 5,5 mm AF låsemutter |
-| M3 rammeskjøt | required | Ø3,4 mm klaringshull |
+| RUTHEX RX-M3×5.7 smeltemutter | required | Ø4,6 × 5,7 mm; Ø4,0 × 6,0 mm blindlomme fra undersiden |
+| M3 rammeskjøt | required | M3×14; Ø3,4 mm klaringshull og Ø5,2 × 3,6 mm bolthodelomme |
 | M3 boggi-, skjerm-, rulle-, støtte- og vinsjfeste | required | Samsvarende Ø3,4 mm gjennomgående hull |
 | M2 linsefeste | required | Ø2,2 mm linseklaring og Ø1,6 mm pilot i lyktehus |
 | M3 mutter | example | 6,2 × 5,5 × 2,6 mm |
@@ -437,8 +483,8 @@ gjenger modelleres direkte; bruk klaringshull, mutterlommer eller varmeinnsatser
 ## Digital verifikasjon
 
 - [x] Komplett trailer uten båt rendret med CGAL: `Simple: yes`.
-- [x] Alle 35 separate eksportmål rendret: `Simple: yes`.
-- [x] Faktiske STL-avgrensninger for alle 35 eksportdeler er målt; største
+- [x] Alle 31 gjeldende separate eksportmål rendret: `Simple: yes`.
+- [x] Faktiske STL-avgrensninger for alle 31 gjeldende eksportdeler er målt; største
   fotavtrykk er 214 × 217 mm og alle tre akser er under 256 mm.
 - [x] Isometrisk PNG oppdatert med den faktiske RIB-referansen.
 - [x] Hardware-debug dekker ramme, boggifestebolter, hjul, rullefester og aksler, støtteflenser og pivoter, skjermfester, vinsjstag, baugstopp, lys, linser og skilt.
@@ -454,7 +500,7 @@ gjenger modelleres direkte; bruk klaringshull, mutterlommer eller varmeinnsatser
 - [ ] Visuell eier-review av proporsjoner og skrogkontakt.
 - [x] Visuell service-review utført med fokuserte bilder; hjul, støtter, vinsj og baklys har identifisert servicetilgang.
 - [x] Boggifestet redesignet som clevis med komplett M3 × 18 mm pivot; arm er fri til ±11°, stopper ved ±12°, og clevis/pivot/hjulsveip er tomme mot skjermsystemet.
-- [x] Alle 35 permanente 3MF-filer slicet med Bambu Studio 2.7.1.62 for A1/0,4 mm uten advarsler; sju PETG-deler og TPU-baugstoppen bruker normal automatisk støtte.
+- [x] De tidligere 35 platebaserte 3MF-filene ble slicet med Bambu Studio 2.7.1.62 for A1/0,4 mm uten advarsler. Disse er foreldet av redesignen 2026-08-30; ny produksjonsslicing venter på fysisk kuponggodkjenning.
 - [ ] Fysiske testutskrifter av skjøt, hjuladapter, boggi og justerbar støtte.
 - [ ] Last-, klarings- og kuletrykktest med ferdig båt.
 
