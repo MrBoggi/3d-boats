@@ -52,7 +52,11 @@ produksjonssammenstillingen.
 
 Ny obligatorisk kupongfil er
 `3mf/integrated_joint_tests/integrated_frame_joint_test.3mf`: én A1-fane,
-11 PLA-objekter. Alle 11 kuponger er CGAL-rendret `Simple: yes`; fire nye
+11 PLA-kuponger med store, 0,65 mm dype gruppetall 1–5. Deler med samme tall skal
+monteres sammen; gruppe 2 har to overdeler og én felles underdel. Det faktiske
+OpenSCAD-renderte delekartet ligger i
+`3mf/integrated_joint_tests/assembly_map.png`.
+Alle 11 kuponger er CGAL-rendret `Simple: yes`; fire nye
 skjøtekollisjonsmoduler gir tom interseksjon. Fysisk godkjenning gjenstår.
 
 Første fysiske prøveprint avslørte at `drawbar_front` og `drawbar_rear` var to massive bjelker i samme volum. Hullene fluktet, men delene kunne bare legges oppå hverandre. Dette er rettet til komplementære halv-i-halv-skjøter med nominell 0,3 mm vertikal printklaring og to M3-bolter per V-arm.

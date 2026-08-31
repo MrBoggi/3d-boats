@@ -58,7 +58,51 @@ module fit_side_support_post_head() {
             cube([24, 24, 28], center = true);
     }
 }
-module fit_test_export(part) {
+function integrated_fit_group(part) =
+    part == "fit_v_front" || part == "fit_v_rear" ? "1" :
+    part == "fit_front_v" || part == "fit_front_rail"
+        || part == "fit_front_crossmember" ? "2" :
+    part == "fit_splice_front" || part == "fit_splice_rear" ? "3" :
+    part == "fit_mid_rail" || part == "fit_mid_crossmember" ? "4" :
+    part == "fit_rear_rail" || part == "fit_rear_crossmember" ? "5" : "";
+
+function integrated_fit_lower(part) =
+    part == "fit_v_rear"
+        || part == "fit_front_crossmember"
+        || part == "fit_splice_rear"
+        || part == "fit_mid_crossmember"
+        || part == "fit_rear_crossmember";
+
+// Keep the large identification mark away from the central fastener pattern.
+function integrated_fit_label_x(part) =
+    part == "fit_v_rear" ? 11 :
+    integrated_fit_lower(part) ? 0 :
+    part == "fit_v_front" || part == "fit_v_rear" ? -9 : -8;
+function integrated_fit_label_y(part) =
+    part == "fit_v_front" || part == "fit_v_rear" ? -2 : 0;
+
+module integrated_fit_engraving(part) {
+    mark = integrated_fit_group(part);
+    if (mark != "") {
+        x = integrated_fit_label_x(part);
+        y = integrated_fit_label_y(part);
+        label_size = part == "fit_v_rear" ? 6 : 7;
+        if (integrated_fit_lower(part))
+            // Mirror so the number reads correctly when the underside is viewed.
+            translate([x, y, -boolean_overlap])
+                mirror([0, 1, 0])
+                    linear_extrude(height = 0.65 + boolean_overlap)
+                        text(mark, size = label_size, halign = "center", valign = "center",
+                            font = "Liberation Sans:style=Bold");
+        else
+            translate([x, y, rail_size[2] - 0.65])
+                linear_extrude(height = 0.65 + boolean_overlap)
+                    text(mark, size = label_size, halign = "center", valign = "center",
+                        font = "Liberation Sans:style=Bold");
+    }
+}
+
+module fit_test_export_raw(part) {
     if (part == "fit_v_front")
         translate([-v_split_x, -v_half_width_at(v_split_x), -frame_bottom_z]) fit_v_joint_coupon(true);
     else if (part == "fit_v_rear")
@@ -90,4 +134,11 @@ module fit_test_export(part) {
     else if (part == "fit_side_post_head")
         translate([-side_support_x[0], -side_support_y, -side_support_top_z[0] + support_post_pivot_boss_diameter / 2]) fit_side_support_post_head();
     else assert(false, str("Unknown fit-test part: ", part));
+}
+
+module fit_test_export(part) {
+    difference() {
+        fit_test_export_raw(part);
+        integrated_fit_engraving(part);
+    }
 }

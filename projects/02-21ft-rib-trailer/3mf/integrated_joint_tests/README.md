@@ -6,6 +6,16 @@ Profilen er 0,20 mm lag, 215 °C dyse, 55 °C plate, fire vegger, fem
 topp-/bunnlag og 15 % gyroid. Kontroller filament og fysisk byggeplate i Bambu
 Studio før utskrift.
 
+## Delekart og nummerering
+
+![Delekart for de fem skjøtegruppene](assembly_map.png)
+
+Alle kupongene har et stort, 0,65 mm dypt tall. Deler med samme tall skal
+monteres sammen. Tallet står på oversiden av overdeler og på undersiden av
+underdeler, slik at graveringen ikke svekker eller endrer anleggsflaten.
+Gruppe 2 består av tre deler: begge overdelene monteres på hver sin ende av
+den samme underdelen.
+
 ## Hardware
 
 - 8 × RUTHEX RX-M3×5.7 smeltemutter, monteringshull Ø4,0 × 6,0 mm
@@ -17,12 +27,12 @@ forsenkningen. Ikke bruk lim eller puss anleggsflatene under testen.
 
 ## Par og monteringsretning
 
-1. `fit_v_front` over `fit_v_rear` — to bolter.
-2. `fit_front_v` og `fit_front_rail` over hver sin tunge på
+1. Tall 1: `fit_v_front` over `fit_v_rear` — to bolter.
+2. Tall 2: `fit_front_v` og `fit_front_rail` over hver sin tunge på
    `fit_front_crossmember` — to bolter totalt.
-3. `fit_splice_front` over `fit_splice_rear` — to bolter.
-4. `fit_mid_rail` over `fit_mid_crossmember` — én bolt.
-5. `fit_rear_rail` over `fit_rear_crossmember` — én bolt.
+3. Tall 3: `fit_splice_front` over `fit_splice_rear` — to bolter.
+4. Tall 4: `fit_mid_rail` over `fit_mid_crossmember` — én bolt.
+5. Tall 5: `fit_rear_rail` over `fit_rear_crossmember` — én bolt.
 
 ## Godkjenning
 
@@ -38,4 +48,6 @@ Rapporter eventuelle avvik i millimeter. Ikke start full alignment-test eller
 PETG-restsett før alle fem grensesnitt er fysisk godkjent.
 
 Pakken regenereres med `python3 scripts/build_integrated_joint_test.py` i
-prosjektmappen. Generatoren bruker de validerte én-del-3MF-filene i `parts/`.
+prosjektmappen. Delekartet regenereres med
+`powershell -File scripts/build_integrated_joint_map.ps1`. Generatoren bruker
+de validerte én-del-3MF-filene i `parts/`.

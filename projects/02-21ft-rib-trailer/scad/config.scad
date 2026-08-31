@@ -384,7 +384,21 @@ winch_strap_end = [bow_eye_center[0] - winch_hook_outer_diameter / 2,
 m3_clearance = 3.4;
 m3_nut_envelope = [6.2, 5.5, 2.6];
 
-selected_part = "assembly";
+// Numeric selector avoids shell quoting problems in reproducible Windows builds.
+integrated_test_part = 0;
+selected_part =
+    integrated_test_part == 1 ? "fit_v_front" :
+    integrated_test_part == 2 ? "fit_v_rear" :
+    integrated_test_part == 3 ? "fit_front_v" :
+    integrated_test_part == 4 ? "fit_front_rail" :
+    integrated_test_part == 5 ? "fit_front_crossmember" :
+    integrated_test_part == 6 ? "fit_splice_front" :
+    integrated_test_part == 7 ? "fit_splice_rear" :
+    integrated_test_part == 8 ? "fit_mid_rail" :
+    integrated_test_part == 9 ? "fit_mid_crossmember" :
+    integrated_test_part == 10 ? "fit_rear_rail" :
+    integrated_test_part == 11 ? "fit_rear_crossmember" :
+    "assembly";
 show_boat = true;
 show_hardware = false;
 show_coupler_reference = true;
